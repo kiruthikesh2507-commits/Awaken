@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <rect width="192" height="192" fill="#080808"/>
+  <polygon points="96,10 182,53 182,139 96,182 10,139 10,53" fill="none" stroke="#dc1428" stroke-width="4"/>
+  <polygon points="96,28 164,66 164,130 96,164 28,130 28,66" fill="none" stroke="#dc1428" stroke-width="2" opacity="0.4"/>
+  <text x="96" y="120" font-family="Arial Black, sans-serif" font-size="80" font-weight="900" fill="#dc1428" text-anchor="middle" filter="url(#glow)">S</text>
+  <defs>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+</svg>

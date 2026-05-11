@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0a0a0a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="SOLO LEVELING" />
+  <meta name="description" content="Gamified self-improvement RPG system. Level up in real life." />
+  <title>SOLO LEVELING SYSTEM</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="app.css" />
+</head>
+<body class="dark-mode" data-screen="boot">
+
+  <!-- BOOT SCREEN -->
+  <div id="screen-boot" class="screen active">
+    <div class="boot-bg"></div>
+    <div class="boot-content">
+      <div class="boot-logo">
+        <div class="logo-hex">
+          <svg viewBox="0 0 100 100" class="hex-svg">
+            <polygon points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5" fill="none" stroke="var(--accent)" stroke-width="2"/>
+            <polygon points="50,15 85,32.5 85,67.5 50,85 15,67.5 15,32.5" fill="none" stroke="var(--accent)" stroke-width="1" opacity="0.4"/>
+          </svg>
+          <span class="hex-letter">S</span>
+        </div>
+      </div>
+      <div class="boot-title">
+        <div class="boot-line1">SOLO LEVELING</div>
+        <div class="boot-line2">— SYSTEM INTERFACE —</div>
+      </div>
+      <div class="boot-loading">
+        <div class="boot-bar-track"><div class="boot-bar-fill" id="bootBar"></div></div>
+        <div class="boot-status" id="bootStatus">INITIALIZING SYSTEM...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ONBOARDING SCREEN -->
+  <div id="screen-onboarding" class="screen">
+    <div class="onboard-bg"></div>
+    <div class="onboard-container">
+      <div class="onboard-header">
+        <div class="system-alert">[ SYSTEM ALERT ]</div>
+        <h1 class="onboard-title">HUNTER REGISTRATION</h1>
+        <p class="onboard-sub">A new player has been detected. Complete registration to access the System.</p>
+      </div>
+
+      <!-- Step indicators -->
+      <div class="steps-indicator">
+        <div class="step-dot active" data-step="1"></div>
+        <div class="step-line"></div>
+        <div class="step-dot" data-step="2"></div>
+        <div class="step-line"></div>
+        <div class="step-dot" data-step="3"></div>
+        <div class="step-line"></div>
+        <div class="step-dot" data-step="4"></div>
+      </div>
+
+      <!-- Step 1: Identity -->
+      <div class="onboard-step active" data-step="1">
+        <div class="step-label">STEP 01 / IDENTITY</div>
+        <div class="form-group">
+          <label class="form-label">HUNTER NAME</label>
+          <input type="text" id="ob-name" class="form-input" placeholder="Enter your name..." maxlength="20" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">AGE</label>
+            <input type="number" id="ob-age" class="form-input" placeholder="Age" min="10" max="99" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">GENDER</label>
+            <select id="ob-gender" class="form-input form-select">
+              <option value="">Select</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">THEME</label>
+          <div class="theme-toggle-row">
+            <button class="theme-btn active" data-theme="dark" onclick="selectTheme('dark')">
+              <span class="theme-icon">◆</span> DARK MODE <span class="theme-sub">Red &amp; Black</span>
+            </button>
+            <button class="theme-btn" data-theme="light" onclick="selectTheme('light')">
+              <span class="theme-icon">◇</span> LIGHT MODE <span class="theme-sub">Red &amp; White</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Physical -->
+      <div class="onboard-step" data-step="2">
+        <div class="step-label">STEP 02 / PHYSICAL DATA</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">HEIGHT (cm)</label>
+            <input type="number" id="ob-height" class="form-input" placeholder="175" min="100" max="250" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">WEIGHT (kg)</label>
+            <input type="number" id="ob-weight" class="form-input" placeholder="70" min="30" max="300" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">CURRENT ACTIVITY LEVEL</label>
+          <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="activity" value="sedentary" /><span>Sedentary — Little to no exercise</span></label>
+            <label class="radio-item"><input type="radio" name="activity" value="light" /><span>Light — 1-3 days/week</span></label>
+            <label class="radio-item"><input type="radio" name="activity" value="moderate" /><span>Moderate — 3-5 days/week</span></label>
+            <label class="radio-item"><input type="radio" name="activity" value="active" /><span>Active — 6-7 days/week</span></label>
+            <label class="radio-item"><input type="radio" name="activity" value="athlete" /><span>Athlete — Intense training daily</span></label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">FITNESS LEVEL</label>
+          <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="fitness" value="beginner" /><span>Beginner</span></label>
+            <label class="radio-item"><input type="radio" name="fitness" value="intermediate" /><span>Intermediate</span></label>
+            <label class="radio-item"><input type="radio" name="fitness" value="advanced" /><span>Advanced</span></label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Lifestyle -->
+      <div class="onboard-step" data-step="3">
+        <div class="step-label">STEP 03 / LIFESTYLE PROFILE</div>
+        <div class="form-group">
+          <label class="form-label">PRIMARY GOALS (select all that apply)</label>
+          <div class="checkbox-group">
+            <label class="check-item"><input type="checkbox" name="goals" value="lose_weight" /><span>Lose Weight</span></label>
+            <label class="check-item"><input type="checkbox" name="goals" value="build_muscle" /><span>Build Muscle</span></label>
+            <label class="check-item"><input type="checkbox" name="goals" value="study_more" /><span>Study / Learn More</span></label>
+            <label class="check-item"><input type="checkbox" name="goals" value="be_social" /><span>Improve Social Skills</span></label>
+            <label class="check-item"><input type="checkbox" name="goals" value="discipline" /><span>Build Discipline & Habits</span></label>
+            <label class="check-item"><input type="checkbox" name="goals" value="appearance" /><span>Improve Appearance & Grooming</span></label>
+            <label class="check-item"><input type="checkbox" name="goals" value="mental_health" /><span>Mental Clarity & Wellness</span></label>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">WAKE-UP TIME</label>
+            <input type="time" id="ob-wakeup" class="form-input" value="07:00" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">SLEEP TIME</label>
+            <input type="time" id="ob-sleep" class="form-input" value="23:00" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">DAILY FREE TIME FOR QUESTS</label>
+          <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="freetime" value="30min" /><span>Under 30 minutes</span></label>
+            <label class="radio-item"><input type="radio" name="freetime" value="1hr" /><span>About 1 hour</span></label>
+            <label class="radio-item"><input type="radio" name="freetime" value="2hr" /><span>1–2 hours</span></label>
+            <label class="radio-item"><input type="radio" name="freetime" value="3hr+" /><span>3+ hours</span></label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4: Confirmation -->
+      <div class="onboard-step" data-step="4">
+        <div class="step-label">STEP 04 / SYSTEM CONFIRMATION</div>
+        <div class="confirm-box">
+          <div class="confirm-title">[ HUNTER PROFILE DETECTED ]</div>
+          <div class="confirm-data" id="confirmData"></div>
+        </div>
+        <div class="confirm-warning">
+          <div class="warning-icon">⚠</div>
+          <div class="warning-text">
+            "From this point forward, the System will monitor your progress. Failure to comply with assigned quests will result in penalties. Do you accept the terms of the Hunter System?"
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="check-item accept-check">
+            <input type="checkbox" id="ob-accept" />
+            <span>I ACCEPT. I will become stronger.</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="onboard-nav">
+        <button class="btn-ghost" id="btnBack" onclick="onboardBack()" style="display:none">◀ BACK</button>
+        <button class="btn-primary" id="btnNext" onclick="onboardNext()">NEXT ▶</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APP -->
+  <div id="screen-app" class="screen">
+
+    <!-- Top Bar -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="rank-badge" id="headerRank">E</div>
+        <div class="header-info">
+          <div class="header-name" id="headerName">HUNTER</div>
+          <div class="header-rank-label" id="headerRankLabel">E-RANK</div>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="rp-display">
+          <span class="rp-icon">◆</span>
+          <span class="rp-amount" id="headerRP">0</span>
+          <span class="rp-label">RP</span>
+        </div>
+        <button class="icon-btn" onclick="toggleTheme()">☀</button>
+        <button class="icon-btn" onclick="showSettings()">⚙</button>
+      </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="app-nav">
+      <button class="nav-btn active" data-tab="dashboard" onclick="switchTab('dashboard')">
+        <span class="nav-icon">⬡</span><span class="nav-label">STATUS</span>
+      </button>
+      <button class="nav-btn" data-tab="quests" onclick="switchTab('quests')">
+        <span class="nav-icon">◈</span><span class="nav-label">QUESTS</span>
+      </button>
+      <button class="nav-btn" data-tab="shop" onclick="switchTab('shop')">
+        <span class="nav-icon">◉</span><span class="nav-label">SHOP</span>
+      </button>
+      <button class="nav-btn" data-tab="inventory" onclick="switchTab('inventory')">
+        <span class="nav-icon">▣</span><span class="nav-label">ITEMS</span>
+      </button>
+      <button class="nav-btn" data-tab="stats" onclick="switchTab('stats')">
+        <span class="nav-icon">◐</span><span class="nav-label">STATS</span>
+      </button>
+    </nav>
+
+    <!-- TAB: DASHBOARD -->
+    <div class="tab-content active" id="tab-dashboard">
+      <div class="scroll-area">
+
+        <!-- Hunter Card -->
+        <div class="hunter-card">
+          <div class="hunter-card-bg"></div>
+          <div class="hunter-card-content">
+            <div class="hc-rank" id="dcRank">E-RANK</div>
+            <div class="hc-name" id="dcName">HUNTER</div>
+            <div class="hc-stats-summary">
+              <div class="hc-stat-item">
+                <span class="hc-stat-val" id="dcTotalStats">55</span>
+                <span class="hc-stat-lbl">TOTAL STATS</span>
+              </div>
+              <div class="hc-stat-divider"></div>
+              <div class="hc-stat-item">
+                <span class="hc-stat-val" id="dcRP">0</span>
+                <span class="hc-stat-lbl">RP</span>
+              </div>
+              <div class="hc-stat-divider"></div>
+              <div class="hc-stat-item">
+                <span class="hc-stat-val" id="dcStreak">0</span>
+                <span class="hc-stat-lbl">STREAK</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rank Progress -->
+        <div class="section-card">
+          <div class="section-label">RANK PROGRESSION</div>
+          <div class="rank-progress-area">
+            <div class="rank-progress-labels">
+              <span id="rpCurrentRank">E-RANK</span>
+              <span id="rpNextRank">D-RANK</span>
+            </div>
+            <div class="rank-bar-track">
+              <div class="rank-bar-fill" id="rankBarFill"></div>
+            </div>
+            <div class="rank-progress-text" id="rankProgressText">55 / 120 stat points</div>
+          </div>
+        </div>
+
+        <!-- Today's Summary -->
+        <div class="section-card">
+          <div class="section-label">TODAY'S MISSION STATUS</div>
+          <div class="mission-grid">
+            <div class="mission-item">
+              <div class="mission-val" id="dcQuestDone">0</div>
+              <div class="mission-lbl">COMPLETED</div>
+            </div>
+            <div class="mission-item">
+              <div class="mission-val" id="dcQuestTotal">8</div>
+              <div class="mission-lbl">TOTAL</div>
+            </div>
+            <div class="mission-item">
+              <div class="mission-val" id="dcRPToday">0</div>
+              <div class="mission-lbl">RP EARNED</div>
+            </div>
+            <div class="mission-item">
+              <div class="mission-val" id="dcStatToday">0</div>
+              <div class="mission-lbl">STATS GAINED</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="section-card">
+          <div class="section-label">STAT OVERVIEW</div>
+          <div class="mini-stats" id="miniStats"></div>
+        </div>
+
+        <!-- Generate Quests -->
+        <button class="btn-generate" id="btnGenerate" onclick="generateDailyQuests()">
+          <span class="btn-gen-icon">⟳</span>
+          <span class="btn-gen-text">GENERATE TODAY'S QUESTS</span>
+          <span class="btn-gen-sub">AI-powered mission assignment</span>
+        </button>
+
+        <!-- Bonus Chest -->
+        <div class="bonus-chests" id="bonusChestArea" style="display:none">
+          <div class="section-label">BONUS CHESTS AVAILABLE</div>
+          <div class="chest-list" id="chestList"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TAB: QUESTS -->
+    <div class="tab-content" id="tab-quests">
+      <div class="scroll-area">
+        <div class="quests-header">
+          <div class="section-label">ACTIVE MISSIONS</div>
+          <div class="quest-date" id="questDate"></div>
+        </div>
+
+        <!-- Quest Filters -->
+        <div class="quest-filters">
+          <button class="filter-btn active" onclick="filterQuests('all')">ALL</button>
+          <button class="filter-btn" onclick="filterQuests('daily')">DAILY</button>
+          <button class="filter-btn" onclick="filterQuests('special')">SPECIAL</button>
+          <button class="filter-btn" onclick="filterQuests('bonus')">BONUS</button>
+          <button class="filter-btn" onclick="filterQuests('challenging')">HARD</button>
+        </div>
+
+        <div id="questList" class="quest-list">
+          <div class="no-quests">
+            <div class="no-quest-icon">◈</div>
+            <div class="no-quest-text">NO MISSIONS ASSIGNED</div>
+            <div class="no-quest-sub">Return to STATUS and generate today's quests</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: SHOP -->
+    <div class="tab-content" id="tab-shop">
+      <div class="scroll-area">
+        <div class="shop-header">
+          <div class="section-label">ITEM SHOP</div>
+          <div class="shop-rp">
+            <span class="rp-icon">◆</span>
+            <span id="shopRP">0</span> RP available
+          </div>
+        </div>
+        <div class="shop-grid" id="shopGrid"></div>
+      </div>
+    </div>
+
+    <!-- TAB: INVENTORY -->
+    <div class="tab-content" id="tab-inventory">
+      <div class="scroll-area">
+        <div class="section-label">INVENTORY</div>
+        <div id="inventoryGrid" class="inventory-grid">
+          <div class="empty-inventory">
+            <div class="empty-icon">▣</div>
+            <div>NO ITEMS IN INVENTORY</div>
+            <div class="empty-sub">Purchase items from the Shop to use them here</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: STATS -->
+    <div class="tab-content" id="tab-stats">
+      <div class="scroll-area">
+        <div class="section-label">HUNTER STATS</div>
+        <div class="stats-grid" id="statsGrid"></div>
+        <div class="section-label" style="margin-top:1.5rem">RANK TABLE</div>
+        <div class="rank-table" id="rankTable"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MODALS -->
+  <div id="modalOverlay" class="modal-overlay" onclick="closeModal()"></div>
+
+  <!-- Quest Complete Modal -->
+  <div id="modalQuestComplete" class="modal">
+    <div class="modal-header">[ MISSION COMPLETE ]</div>
+    <div class="modal-quest-name" id="mqName"></div>
+    <div class="modal-rewards">
+      <div class="reward-row"><span class="reward-label">RP EARNED</span><span class="reward-val" id="mqRP">+0</span></div>
+      <div class="reward-row"><span class="reward-label">STAT GAINED</span><span class="reward-val" id="mqStat">+0</span></div>
+      <div class="reward-row"><span class="reward-label">STAT TYPE</span><span class="reward-val" id="mqStatType">—</span></div>
+    </div>
+    <div class="modal-bonus" id="mqBonus" style="display:none">
+      <div class="bonus-alert">⬡ BONUS CHEST UNLOCKED!</div>
+    </div>
+    <button class="btn-primary" onclick="closeModal()">ACKNOWLEDGED</button>
+  </div>
+
+  <!-- Chest Modal -->
+  <div id="modalChest" class="modal">
+    <div class="modal-header">[ BONUS CHEST ]</div>
+    <div class="chest-anim">⬡</div>
+    <div class="modal-quest-name" id="chestRewardName">Mystery Reward</div>
+    <div class="modal-rewards">
+      <div class="reward-row"><span class="reward-label">REWARD</span><span class="reward-val" id="chestRewardVal">???</span></div>
+    </div>
+    <button class="btn-primary" onclick="closeModal()">COLLECT</button>
+  </div>
+
+  <!-- Loading Modal -->
+  <div id="modalLoading" class="modal">
+    <div class="loading-spinner">
+      <div class="spinner-hex"></div>
+    </div>
+    <div class="modal-header">SYSTEM PROCESSING</div>
+    <div class="loading-msg" id="loadingMsg">Generating missions...</div>
+  </div>
+
+  <!-- Penalty Modal -->
+  <div id="modalPenalty" class="modal">
+    <div class="modal-header penalty-header">[ PUNISHMENT ]</div>
+    <div class="modal-quest-name">DESTRUCTION PENALTY TRIGGERED</div>
+    <div class="penalty-text">The System has detected negligence. Prepare yourself.</div>
+    <div class="modal-rewards" id="penaltyDetails"></div>
+    <button class="btn-danger" onclick="closeModal()">ACKNOWLEDGED</button>
+  </div>
+
+  <!-- Settings Panel -->
+  <div id="settingsPanel" class="settings-panel">
+    <div class="settings-header">
+      <div class="section-label">SYSTEM SETTINGS</div>
+      <button class="icon-btn" onclick="hideSettings()">✕</button>
+    </div>
+    <div class="settings-body">
+      <div class="setting-item">
+        <span>Theme</span>
+        <button class="btn-ghost small" onclick="toggleTheme()">Toggle</button>
+      </div>
+      <div class="setting-item">
+        <span>Hunter Name</span>
+        <span id="settingName" class="setting-val"></span>
+      </div>
+      <div class="setting-item">
+        <span>Reset Progress</span>
+        <button class="btn-danger small" onclick="confirmReset()">RESET</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
