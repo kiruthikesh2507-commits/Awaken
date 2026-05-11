@@ -334,7 +334,7 @@ async function callAIForQuests() {
 
   const prompt = buildQuestPrompt(h, totalStats, rankName, isChallengeDay);
 
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
+  const response = await fetch('/api/quest', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
