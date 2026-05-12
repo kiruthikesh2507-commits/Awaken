@@ -262,11 +262,7 @@ function injectWorkoutSteps() {
     }
   }
 
-  // Re-number existing steps 1-3 and 4 becomes 5, 6
-  document.querySelectorAll('.onboard-step').forEach(s => {
-    const n = parseInt(s.dataset.step);
-    if (n >= 4) s.dataset.step = n + 2; // shift confirmation to step 6
-  });
+  // Confirmation step is already data-step="6" in HTML, no renaming needed
 
   // Step 4: Workout Environment + Split
   const step4 = document.createElement('div');
@@ -341,13 +337,10 @@ function injectWorkoutSteps() {
     <div id="dayAssignmentGrid" class="day-assignment-grid"></div>
   `;
 
-  // Insert before step 5 (old step 4 = now step 6)
+  // Insert steps 4, 5 before nav; step 6 is already in HTML before nav
   const step6 = document.querySelector('.onboard-step[data-step="6"]');
-  container.insertBefore(step4, nav);
-  container.insertBefore(step5, nav);
-
-  // Move step 6 to correct position
-  container.insertBefore(step6, nav);
+  container.insertBefore(step4, step6);
+  container.insertBefore(step5, step6);
 }
 
 window.onSplitChange = function(splitVal) {
@@ -362,6 +355,20 @@ window.onSplitChange = function(splitVal) {
   });
 };
 
+// ─── TAP BUTTON OPTIONS FOR DAY ASSIGNMENT ───────────────────────────────────
+const DAY_OPTIONS = [
+  { label: '🛌 Rest',       value: 'rest',                  muscles: null },
+  { label: '💪 Push',       value: 'chest+shoulders+triceps', muscles: ['chest','shoulders','triceps'] },
+  { label: '🔙 Pull',       value: 'back+biceps',            muscles: ['back','biceps'] },
+  { label: '🦵 Legs',       value: 'quads+hamstrings+glutes', muscles: ['quads','hamstrings','glutes'] },
+  { label: '🏋 Chest',      value: 'chest',                  muscles: ['chest'] },
+  { label: '🔗 Back',       value: 'back',                   muscles: ['back'] },
+  { label: '🔼 Shoulders',  value: 'shoulders',              muscles: ['shoulders'] },
+  { label: '💥 Arms',       value: 'biceps+triceps',         muscles: ['biceps','triceps'] },
+  { label: '⚡ Full Body',  value: 'fullbody',               muscles: ['fullbody'] },
+  { label: '🧘 Core',       value: 'core',                   muscles: ['core'] },
+];
+
 function buildDayAssignmentGrid() {
   const grid = document.getElementById('dayAssignmentGrid');
   if (!grid) return;
@@ -371,59 +378,78 @@ function buildDayAssignmentGrid() {
   const days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
   const splitCycle = SPLITS[split]?.cycle || SPLITS.apphandle.cycle;
 
-  // Assign split days to first N weekdays, rest = rest
+  // Build default schedule from split
   let cycleIdx = 0;
-  grid.innerHTML = days.map((day, i) => {
+  const defaults = days.map((day, i) => {
     const isWorkoutDay = i < daysPerWeek;
     const splitDay = isWorkoutDay ? splitCycle[cycleIdx++ % splitCycle.length] : null;
-    const defaultMuscles = splitDay ? splitDay.muscles : [];
-    const defaultLabel = splitDay ? splitDay.label : 'Rest Day';
+    return splitDay ? splitDay.muscles[0] : 'rest';
+  });
 
-    return `
-      <div class="day-row">
-        <div class="day-name">${day.substring(0,3).toUpperCase()}</div>
-        <div class="day-muscles">
-          <select class="day-select form-input" data-day="${day}" onchange="onDayChange('${day}', this.value)">
-            <option value="rest">🛌 Rest Day</option>
-            ${Object.entries(MUSCLE_LABELS).map(([k,v]) =>
-              `<option value="${k}" ${defaultMuscles.includes(k) ? (defaultMuscles.indexOf(k) === 0 ? 'selected' : '') : ''}>💪 ${v}</option>`
-            ).join('')}
-            ${['chest+back','chest+shoulders','back+biceps','chest+triceps','quads+hamstrings','quads+glutes','core+shoulders'].map(combo =>
-              `<option value="${combo}">💪 ${combo.split('+').map(m=>MUSCLE_LABELS[m]||m).join(' + ')}</option>`
-            ).join('')}
-            <option value="fullbody">⚡ Full Body</option>
-          </select>
-          <div class="day-label-preview" id="preview-${day}">${defaultLabel}</div>
-        </div>
-      </div>`;
-  }).join('');
+  grid.innerHTML = `
+    <style>
+      .day-btn-row { display:flex; flex-direction:column; gap:0.6rem; margin-bottom:0.5rem; }
+      .day-btn-header { display:flex; align-items:center; gap:0.8rem; }
+      .day-btn-label { font-family:var(--font-main); font-size:0.75rem; color:var(--accent); font-weight:700; width:2.5rem; flex-shrink:0; }
+      .day-selected-val { font-size:0.8rem; color:var(--text); font-family:var(--font-main); }
+      .day-btn-options { display:flex; flex-wrap:wrap; gap:0.4rem; }
+      .day-opt-btn { padding:0.35rem 0.65rem; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--text-muted); font-size:0.75rem; font-family:var(--font-main); cursor:pointer; transition:all 0.15s; white-space:nowrap; }
+      .day-opt-btn.active { border-color:var(--accent); background:rgba(220,20,40,0.15); color:var(--accent); font-weight:700; }
+    </style>
+    ${days.map((day, i) => {
+      const defaultVal = defaults[i] || 'rest';
+      const defaultOpt = DAY_OPTIONS.find(o => o.value === defaultVal) || DAY_OPTIONS[0];
+      return `
+        <div class="day-btn-row">
+          <div class="day-btn-header">
+            <div class="day-btn-label">${day.substring(0,3).toUpperCase()}</div>
+            <div class="day-selected-val" id="sel-${day}">${defaultOpt.label}</div>
+          </div>
+          <div class="day-btn-options">
+            ${DAY_OPTIONS.map(opt => `
+              <button type="button"
+                class="day-opt-btn${opt.value === defaultVal ? ' active' : ''}"
+                onclick="onDayBtnClick('${day}', '${opt.value}', this)">
+                ${opt.label}
+              </button>`).join('')}
+          </div>
+        </div>`;
+    }).join('')}
+  `;
 
-  // Set custom schedule from grid
+  // Set initial custom schedule
   days.forEach((day, i) => {
-    const isWorkout = i < daysPerWeek;
-    const splitDay = isWorkout ? splitCycle[(i > 0 ? i : 0) % splitCycle.length] : null;
-    customSchedule[day] = isWorkout && splitDay ? splitDay.muscles : null;
+    const val = defaults[i] || 'rest';
+    const opt = DAY_OPTIONS.find(o => o.value === val);
+    customSchedule[day] = opt ? opt.muscles : null;
   });
 }
 
-window.onDayChange = function(day, val) {
-  const preview = document.getElementById('preview-' + day);
-  if (val === 'rest') {
-    customSchedule[day] = null;
-    if (preview) preview.textContent = 'Rest Day';
-  } else if (val.includes('+')) {
-    customSchedule[day] = val.split('+');
-    if (preview) preview.textContent = val.split('+').map(m => MUSCLE_LABELS[m] || m).join(' + ');
-  } else {
-    customSchedule[day] = [val];
-    if (preview) preview.textContent = MUSCLE_LABELS[val] || val;
-  }
+window.onDayBtnClick = function(day, val, btn) {
+  // Update active button style
+  const row = btn.closest('.day-btn-row');
+  row.querySelectorAll('.day-opt-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  // Update label
+  const opt = DAY_OPTIONS.find(o => o.value === val);
+  const sel = document.getElementById('sel-' + day);
+  if (sel && opt) sel.textContent = opt.label;
+
+  // Update schedule
+  customSchedule[day] = opt ? opt.muscles : null;
 };
+
+// Keep onDayChange for backward compat
+window.onDayChange = function() {};
 
 function renderOnboardingStep(step) {
   document.querySelectorAll('.onboard-step').forEach(s => s.classList.remove('active'));
   const el = document.querySelector(`.onboard-step[data-step="${step}"]`);
   if (el) el.classList.add('active');
+  // Scroll onboarding container to top so content is always visible
+  const container = document.querySelector('.onboard-container');
+  if (container) container.scrollTop = 0;
 
   document.querySelectorAll('.step-dot').forEach(d => {
     const n = parseInt(d.dataset.step);
