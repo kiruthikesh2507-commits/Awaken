@@ -1,4 +1,4 @@
-# SOLO LEVELING SYSTEM
+# AWAKEN SYSTEM
 ## Real-Life RPG Self-Improvement App
 
 ---

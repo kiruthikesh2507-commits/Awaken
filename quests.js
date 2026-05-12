@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════
-   SOLO LEVELING SYSTEM — QUEST DATABASE
+   AWAKEN SYSTEM — QUEST DATABASE
    10,000+ quests across all muscle groups,
    equipment types, and life categories
    ═══════════════════════════════════════════ */
@@ -1410,9 +1410,10 @@ function generateQuestsLocally(hunter, rankName) {
     const lifestyleQuests = pickLifestyleQuests(goals, fitnessLevel, rankName, 5, [...usedNames, ...lightQuests.map(q=>q.name), ...stretchQuests.map(q=>q.name)]);
     quests.push(...lightQuests, ...stretchQuests, ...lifestyleQuests);
   } else {
-    // Workout day: 4 fitness quests (based on muscles) + 4 lifestyle
+    // Workout day: 7-8 fitness quests (based on muscles) + keep lifestyle quests unchanged
     const muscleCount = todayMuscles.length;
-    const fitnessQuestsPerMuscle = Math.max(1, Math.floor(4 / muscleCount));
+    const totalFitnessTarget = 8;
+    const fitnessQuestsPerMuscle = Math.max(1, Math.floor(totalFitnessTarget / muscleCount));
 
     todayMuscles.forEach(muscle => {
       const mQuests = pickQuestsForMuscle(muscle, fitnessLevel, rankName, workoutEnv, fitnessQuestsPerMuscle, usedNames);
@@ -1420,20 +1421,20 @@ function generateQuestsLocally(hunter, rankName) {
       mQuests.forEach(q => usedNames.push(q.name));
     });
 
-    // Fill to 4 fitness quests if needed
-    while (quests.length < 4) {
-      const extra = pickQuestsForMuscle(todayMuscles[0], fitnessLevel, rankName, workoutEnv, 1, usedNames.concat(quests.map(q=>q.name)));
+    // Fill to 8 fitness quests if needed
+    while (quests.length < 8) {
+      const extra = pickQuestsForMuscle(todayMuscles[quests.length % todayMuscles.length] || todayMuscles[0], fitnessLevel, rankName, workoutEnv, 1, usedNames.concat(quests.map(q=>q.name)));
       if (!extra.length) break;
       quests.push(...extra);
     }
 
-    // 4 lifestyle quests
-    const lifeQuests = pickLifestyleQuests(goals, fitnessLevel, rankName, 4, usedNames.concat(quests.map(q=>q.name)));
+    // 3 lifestyle quests (unchanged from before)
+    const lifeQuests = pickLifestyleQuests(goals, fitnessLevel, rankName, 3, usedNames.concat(quests.map(q=>q.name)));
     quests.push(...lifeQuests);
   }
 
-  // Cap to 8 daily quests
-  const dailyQuests = quests.slice(0, 8).map((q, i) => ({...q, id: `d${i}_${Date.now()}`, type: 'daily'}));
+  // Cap to 11 daily quests (8 workout + 3 lifestyle)
+  const dailyQuests = quests.slice(0, 11).map((q, i) => ({...q, id: `d${i}_${Date.now()}`, type: 'daily'}));
 
   // 1 special quest (harder)
   const specialPool = pickQuestsForMuscle(

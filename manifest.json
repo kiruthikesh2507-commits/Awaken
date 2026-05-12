@@ -1,6 +1,6 @@
 {
-  "name": "Solo Leveling System",
-  "short_name": "SOLO LVL",
+  "name": "Awaken System",
+  "short_name": "AWAKEN",
   "description": "Gamified real-life RPG self-improvement system",
   "start_url": "./index.html",
   "display": "standalone",

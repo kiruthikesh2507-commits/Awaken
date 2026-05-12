@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════
-   SOLO LEVELING SYSTEM — APPLICATION LOGIC
+   AWAKEN SYSTEM — APPLICATION LOGIC
    v2.0 — Local Quest Engine (No API Required)
    ═══════════════════════════════════════════ */
 
@@ -593,7 +593,10 @@ window.switchTab = function(tab) {
   if (tab === 'shop')         { renderShop(); }
   if (tab === 'inventory')    { renderInventory(); }
   if (tab === 'quests')       { renderQuests(); }
-  if (tab === 'achievements') { if (typeof renderAchievements === 'function') renderAchievements(); }
+  if (tab === 'achievements') {
+    if (typeof renderAchievements === 'function') renderAchievements();
+    else setTimeout(() => { if (typeof renderAchievements === 'function') renderAchievements(); }, 100);
+  }
 };
 
 // ─── QUEST GENERATION (LOCAL) ─────────────────────────────────────────────────
@@ -1118,7 +1121,6 @@ window.closeModal = function() {
 // ─── SETTINGS ─────────────────────────────────────────────────────────────────
 
 window.showSettings = function() {
-  // Populate current values
   if (STATE.hunter) {
     const wu = document.getElementById('setting-wakeup');
     const sl = document.getElementById('setting-sleep');
@@ -1128,8 +1130,12 @@ window.showSettings = function() {
     if (fi) fi.value = STATE.hunter.fitness || 'beginner';
   }
   document.getElementById('settingsPanel').classList.add('open');
+  document.getElementById('settingsOverlay').classList.add('open');
 };
-window.hideSettings = function() { document.getElementById('settingsPanel').classList.remove('open'); };
+window.hideSettings = function() {
+  document.getElementById('settingsPanel').classList.remove('open');
+  document.getElementById('settingsOverlay').classList.remove('open');
+};
 
 window.saveProfileSettings = function() {
   if (!STATE.hunter) return;
@@ -1149,7 +1155,7 @@ window.exportData = function() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'solo-leveling-backup-' + getTodayStr() + '.json';
+    a.download = 'awaken-backup-' + getTodayStr() + '.json';
     a.click();
     URL.revokeObjectURL(url);
     showToast('DATA EXPORTED', 'success');
@@ -1202,12 +1208,12 @@ function showToast(msg, type = '') {
 // ─── PERSISTENCE ─────────────────────────────────────────────────────────────
 
 function saveState() {
-  try { localStorage.setItem('soloLevelingState', JSON.stringify(STATE)); } catch(e) {}
+  try { localStorage.setItem('awakenState', JSON.stringify(STATE)); } catch(e) {}
 }
 
 function loadState() {
   try {
-    const raw = localStorage.getItem('soloLevelingState');
+    const raw = localStorage.getItem('awakenState');
     if (raw) STATE = { ...STATE, ...JSON.parse(raw) };
   } catch(e) {}
 }

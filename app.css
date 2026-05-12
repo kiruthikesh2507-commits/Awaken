@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════
-   SOLO LEVELING SYSTEM — STYLESHEET
+   AWAKEN SYSTEM — STYLESHEET
    ═══════════════════════════════════════════ */
 
 :root {
@@ -421,15 +421,16 @@ html, body {
   height: 2px; background: var(--accent);
   box-shadow: 0 0 8px var(--accent);
 }
-.nav-icon { font-size: 1.1rem; }
-.nav-label { font-family: 'Share Tech Mono', monospace; font-size: 0.5rem; letter-spacing: 0.06em; }
-@media (max-width: 380px) {
-  .nav-label { font-size: 0.42rem; letter-spacing: 0.02em; }
-  .nav-btn { gap: 2px; }
+.nav-icon { font-size: 1rem; }
+.nav-label { font-family: 'Share Tech Mono', monospace; font-size: 0.48rem; letter-spacing: 0.03em; }
+@media (max-width: 400px) {
+  .nav-label { font-size: 0.42rem; letter-spacing: 0.01em; }
+  .nav-icon { font-size: 0.95rem; }
+  .nav-btn { gap: 2px; padding: 0 2px; }
 }
-@media (max-width: 320px) {
-  .nav-label { display: none; }
-  .nav-icon { font-size: 1.2rem; }
+@media (max-width: 340px) {
+  .nav-label { font-size: 0.38rem; }
+  .nav-icon { font-size: 0.9rem; }
 }
 
 /* Scroll area */
@@ -951,20 +952,36 @@ html, body {
 }
 
 /* ─── SETTINGS PANEL ─── */
+.settings-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 249;
+}
+.settings-overlay.open { display: block; }
 .settings-panel {
-  position: fixed; top: 0; right: -100%; width: min(300px, 80%);
+  position: fixed; top: 0; right: -100%; width: 100%;
   height: 100%; background: var(--bg-secondary);
   border-left: 1px solid var(--border);
-  z-index: 150; transition: right 0.3s ease;
+  z-index: 250; transition: right 0.3s ease;
   display: flex; flex-direction: column;
   box-shadow: -10px 0 40px rgba(0,0,0,0.5);
+  overflow: hidden;
 }
 .settings-panel.open { right: 0; }
 .settings-header {
   display: flex; justify-content: space-between; align-items: center;
   padding: 1.5rem 1rem; border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
 }
-.settings-body { padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; flex: 1; }
+.settings-body {
+  padding: 1rem;
+  display: flex; flex-direction: column; gap: 0.75rem;
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: calc(var(--nav-height) + 2rem);
+}
 .setting-item {
   display: flex; justify-content: space-between; align-items: center;
   padding: 0.75rem;
@@ -1083,7 +1100,7 @@ html, body {
 /* ─── ACHIEVEMENTS GRID ─── */
 .achievements-list {
   display: grid; grid-template-columns: 1fr 1fr;
-  gap: 0.6rem; padding: 0 1rem 6rem;
+  gap: 0.6rem; padding: 0 0 2rem;
 }
 
 .ach-card {

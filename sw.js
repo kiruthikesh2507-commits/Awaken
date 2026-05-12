@@ -1,5 +1,5 @@
-/* SOLO LEVELING — SERVICE WORKER */
-const CACHE = 'solo-leveling-v1';
+/* AWAKEN — SERVICE WORKER */
+const CACHE = 'awaken-v1';
 const ASSETS = [
   './',
   './index.html',

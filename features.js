@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════
-   SOLO LEVELING SYSTEM — FEATURES MODULE
+   AWAKEN SYSTEM — FEATURES MODULE
    Feature 1: Achievement / Badge System (220 badges, 5 tiers)
    Feature 2: Dungeon Gate Pop-Up Quests (30s timer, hard penalty)
    ═══════════════════════════════════════════════════════════════════ */
@@ -245,7 +245,7 @@ const ACHIEVEMENTS = [
   { id:'all_stats_500',   tier:'diamond', icon:'⬡',   name:'Omnipotent',          desc:'Raise all stats to at least 500.',                    condition: s => s.stats && Object.values(s.stats).every(v => v >= 500) },
   { id:'five_years',      tier:'diamond', icon:'👑',  name:'Five Years of Power',  desc:'Play for 1,825 days.',                                condition: s => getDaysSinceStart(s) >= 1825 },
   { id:'workout_10000',   tier:'diamond', icon:'🏋',  name:'Eternal Gym God',     desc:'Complete 10,000 workout quests.',                     condition: s => (s.hunter?.workoutQuestsDone||0) >= 10000 },
-  { id:'no_quit',         tier:'diamond', icon:'🏆',  name:'SOLO LEVELING',       desc:'Reach DEMI GOD rank with a 365+ streak. You are the strongest.',  condition: s => getTotalStatsF(s) >= 2600 && (s.streak||0) >= 365 },
+  { id:'no_quit',         tier:'diamond', icon:'🏆',  name:'AWAKEN',       desc:'Reach DEMI GOD rank with a 365+ streak. You are the strongest.',  condition: s => getTotalStatsF(s) >= 2600 && (s.streak||0) >= 365 },
   { id:'shadow_monarch',  tier:'diamond', icon:'👁',  name:'SHADOW MONARCH',      desc:'Reach DEMI GOD, complete 1,000+ dungeons, and maintain a 1,000-day streak.',  condition: s => getTotalStatsF(s) >= 2600 && (s.hunter?.dungeonsCompleted||0) >= 1000 && (s.streak||0) >= 1000 },
 ];
 
