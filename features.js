@@ -202,7 +202,7 @@ const ACHIEVEMENTS = [
   { id:'dungeon_200',     tier:'platinum', icon:'🗺', name:'Gate God',            desc:'Complete 200 Dungeon quests.',                        condition: s => (s.hunter?.dungeonsCompleted||0) >= 200 },
   { id:'streak_500',      tier:'platinum', icon:'🌕', name:'500-Day Warrior',     desc:'Achieve a 500-day streak.',                           condition: s => (s.streak||0) >= 500 },
   { id:'total_2400',      tier:'platinum', icon:'📊', name:'Transcendent Power',  desc:'Reach 2,400 stat points.',                            condition: s => getTotalStatsF(s) >= 2400 },
-  { id:'mystery_rank',    tier:'platinum', icon:'❓', name:'???-Rank',            desc:'Reach ???-Rank (2,400 stat points).',                 condition: s => getTotalStatsF(s) >= 2400 },
+  { id:'mystery_rank',    tier:'platinum', icon:'✗',  name:'X-Rank',              desc:'Reach X-Rank (2,400 stat points).',                    condition: s => getTotalStatsF(s) >= 2400 },
   { id:'quest_5000',      tier:'platinum', icon:'🎖', name:'Five Thousand',       desc:'Complete 5,000 quests.',                              condition: s => (s.hunter?.questsEverCompleted||0) >= 5000 },
   { id:'no_skip_500',     tier:'platinum', icon:'✅', name:'500 Days No Excuses', desc:'Complete quests 500 days without skipping.',          condition: s => (s.hunter?.noSkipStreak||0) >= 500 },
   { id:'all_stats_250',   tier:'platinum', icon:'⬡',  name:'Maximum Existence',   desc:'Raise all stats to at least 250.',                    condition: s => s.stats && Object.values(s.stats).every(v => v >= 250) },
@@ -217,8 +217,8 @@ const ACHIEVEMENTS = [
   { id:'dungeon_500',     tier:'platinum', icon:'🚪', name:'Rift Master',         desc:'Complete 500 Dungeon quests.',                        condition: s => (s.hunter?.dungeonsCompleted||0) >= 500 },
 
   // ══════════════ DIAMOND — GOD TIER (30 badges) ══════════════
-  { id:'demi_god',        tier:'diamond', icon:'∞',   name:'DEMI GOD',            desc:'Reach DEMI GOD rank (2,600 stat points). The pinnacle of existence.',  condition: s => getTotalStatsF(s) >= 2600 },
-  { id:'total_2600',      tier:'diamond', icon:'💠',  name:'Infinite Power',      desc:'Reach 2,600 stat points — DEMI GOD achieved.',        condition: s => getTotalStatsF(s) >= 2600 },
+  { id:'demi_god',        tier:'diamond', icon:'Z',   name:'Z-RANK',              desc:'Reach Z-Rank (2,600 stat points). The pinnacle of existence.',        condition: s => getTotalStatsF(s) >= 2600 },
+  { id:'total_2600',      tier:'diamond', icon:'💠',  name:'Infinite Power',      desc:'Reach 2,600 stat points — Z-Rank achieved.',          condition: s => getTotalStatsF(s) >= 2600 },
   { id:'streak_1000',     tier:'diamond', icon:'🔥',  name:'Eternal Flame',       desc:'Achieve a 1,000-day streak.',                         condition: s => (s.streak||0) >= 1000 },
   { id:'quest_10000',     tier:'diamond', icon:'💎',  name:'Ten Thousand',        desc:'Complete 10,000 quests. A true legend.',               condition: s => (s.hunter?.questsEverCompleted||0) >= 10000 },
   { id:'all_stats_300',   tier:'diamond', icon:'⬡',   name:'Absolute Maximum',    desc:'Raise all stats to at least 300.',                    condition: s => s.stats && Object.values(s.stats).every(v => v >= 300) },
@@ -245,8 +245,8 @@ const ACHIEVEMENTS = [
   { id:'all_stats_500',   tier:'diamond', icon:'⬡',   name:'Omnipotent',          desc:'Raise all stats to at least 500.',                    condition: s => s.stats && Object.values(s.stats).every(v => v >= 500) },
   { id:'five_years',      tier:'diamond', icon:'👑',  name:'Five Years of Power',  desc:'Play for 1,825 days.',                                condition: s => getDaysSinceStart(s) >= 1825 },
   { id:'workout_10000',   tier:'diamond', icon:'🏋',  name:'Eternal Gym God',     desc:'Complete 10,000 workout quests.',                     condition: s => (s.hunter?.workoutQuestsDone||0) >= 10000 },
-  { id:'no_quit',         tier:'diamond', icon:'🏆',  name:'AWAKEN',       desc:'Reach DEMI GOD rank with a 365+ streak. You are the strongest.',  condition: s => getTotalStatsF(s) >= 2600 && (s.streak||0) >= 365 },
-  { id:'shadow_monarch',  tier:'diamond', icon:'👁',  name:'SHADOW MONARCH',      desc:'Reach DEMI GOD, complete 1,000+ dungeons, and maintain a 1,000-day streak.',  condition: s => getTotalStatsF(s) >= 2600 && (s.hunter?.dungeonsCompleted||0) >= 1000 && (s.streak||0) >= 1000 },
+  { id:'no_quit',         tier:'diamond', icon:'🏆',  name:'AWAKEN',              desc:'Reach Z-Rank with a 365+ streak. You are the strongest.',             condition: s => getTotalStatsF(s) >= 2600 && (s.streak||0) >= 365 },
+  { id:'shadow_monarch',  tier:'diamond', icon:'👁',  name:'SHADOW MONARCH',      desc:'Reach Z-Rank, complete 1,000+ dungeons, and maintain a 1,000-day streak.', condition: s => getTotalStatsF(s) >= 2600 && (s.hunter?.dungeonsCompleted||0) >= 1000 && (s.streak||0) >= 1000 },
 ];
 
 // ─── HELPER: Get total stats (mirrors app.js logic without circular dep) ─────

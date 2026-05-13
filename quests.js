@@ -17,8 +17,8 @@ const RANK_SCALE = {
   'S-Rank':   { sets: 1, repMult: 1.8, timeMult: 1.8 },
   'SS-Rank':  { sets: 1, repMult: 2.2, timeMult: 2.2 },
   'SSS-Rank': { sets: 1, repMult: 2.5, timeMult: 2.5 },
-  '???-Rank': { sets: 1, repMult: 3.0, timeMult: 3.0 },
-  'DEMI GOD': { sets: 1, repMult: 3.5, timeMult: 3.5 },
+  'X-Rank':   { sets: 1, repMult: 3.0, timeMult: 3.0 },
+  'Z-Rank':   { sets: 1, repMult: 3.5, timeMult: 3.5 },
 };
 
 // ─── FITNESS LEVEL SCALING ────────────────────────────────────────────────────
@@ -1334,7 +1334,7 @@ function getRankRPMultiplier(rankName) {
   const multipliers = {
     'E-Rank': 1.0, 'D-Rank': 1.2, 'C-Rank': 1.5,
     'B-Rank': 2.0, 'A-Rank': 2.5, 'S-Rank': 3.0,
-    'SS-Rank': 3.5, 'SSS-Rank': 4.0, '???-Rank': 5.0, 'DEMI GOD': 6.0
+    'SS-Rank': 3.5, 'SSS-Rank': 4.0, 'X-Rank': 5.0, 'Z-Rank': 6.0
   };
   return multipliers[rankName] || 1.0;
 }

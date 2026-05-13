@@ -16,8 +16,8 @@ const RANKS = [
   { name: 'S-Rank',    short: 'S',   min: 1300, max: 1699 },
   { name: 'SS-Rank',   short: 'SS',  min: 1700, max: 2099 },
   { name: 'SSS-Rank',  short: 'SSS', min: 2100, max: 2399 },
-  { name: '???-Rank',  short: '?',   min: 2400, max: 2599 },
-  { name: 'DEMI GOD',  short: '∞',   min: 2600, max: Infinity },
+  { name: 'X-Rank',    short: 'X',   min: 2400, max: 2599 },
+  { name: 'Z-Rank',   short: 'Z',   min: 2600, max: Infinity },
 ];
 
 const STATS_LIST = [
@@ -1260,7 +1260,7 @@ function syncUI() {
   } else {
     document.getElementById('rpNextRank').textContent = 'MAX';
     document.getElementById('rankBarFill').style.width = '100%';
-    document.getElementById('rankProgressText').textContent = `${total} — DEMI GOD ACHIEVED`;
+    document.getElementById('rankProgressText').textContent = `${total} — Z-RANK ACHIEVED`;
   }
 
   const completed = STATE.quests.filter(q => q.completed && !q.skipped).length;
