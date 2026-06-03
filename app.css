@@ -1554,3 +1554,427 @@ html, body {
   font-size: 0.7rem;
   letter-spacing: 0.05em;
 }
+/* ═══════════════════════════════════════════════════════════════
+   TRACK PROGRESS FEATURE STYLES
+   ═══════════════════════════════════════════════════════════════ */
+
+.track-progress-card {
+  margin: 1rem 1rem;
+}
+
+.progress-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1rem;
+}
+
+.progress-tab-btn {
+  flex: 1;
+  padding: 0.6rem 0.8rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-family: var(--font-main);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.progress-tab-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.progress-tab-btn.active {
+  background: linear-gradient(135deg, var(--accent)22, var(--accent)11);
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 0 12px var(--accent)22;
+}
+
+.progress-icon {
+  font-size: 0.9rem;
+}
+
+.progress-tab-content {
+  display: none;
+  animation: fadeIn 0.3s ease;
+}
+
+.progress-tab-content.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ─── Weight Input ──────────────────────────────────────────────── */
+
+.weight-input-group {
+  margin-bottom: 1.5rem;
+}
+
+.weight-input-row {
+  display: flex;
+  gap: 0.8rem;
+  align-items: flex-end;
+}
+
+.weight-input-field {
+  flex: 1;
+}
+
+.weight-input {
+  font-size: 1rem !important;
+  font-weight: 600;
+  text-align: center;
+}
+
+.btn-log-weight {
+  padding: 0.5rem 1rem;
+  min-width: 80px;
+  height: auto;
+}
+
+/* ─── Weight Chart ────────────────────────────────────────────────── */
+
+.weight-chart-container {
+  background: linear-gradient(135deg, var(--accent)11, var(--accent)05);
+  border: 1px solid var(--accent)22;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.weight-chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.chart-title {
+  font-family: var(--font-main);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.08em;
+}
+
+.chart-days {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.weight-chart {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  height: 120px;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+  padding: 0.5rem 0;
+}
+
+.weight-bar {
+  flex: 1;
+  background: linear-gradient(180deg, var(--accent), var(--accent)77);
+  border-radius: 4px 4px 0 0;
+  min-height: 4px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.weight-bar:hover {
+  filter: brightness(1.2);
+}
+
+.weight-bar-label {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.weight-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+}
+
+.weight-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  background: var(--surface);
+  padding: 0.6rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+.stat-label {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.stat-value {
+  font-size: 0.95rem;
+  color: var(--accent);
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+/* ─── Weight History ────────────────────────────────────────────────── */
+
+.weight-history {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.weight-entry {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.weight-entry:hover {
+  border-color: var(--accent);
+  background: var(--surface);
+}
+
+.weight-entry-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.weight-entry-date {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.weight-entry-weight {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.weight-entry-right {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.weight-entry-delete {
+  padding: 0.3rem 0.6rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.weight-entry-delete:hover {
+  border-color: #ef4444;
+  color: #ef4444;
+  background: #ef444411;
+}
+
+.history-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 2rem 1rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 2.5rem;
+  opacity: 0.3;
+}
+
+.empty-text {
+  font-family: var(--font-main);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.empty-sub {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  opacity: 0.8;
+}
+
+/* ─── Weekly Notes ────────────────────────────────────────────────── */
+
+.weekly-note-input {
+  margin-bottom: 1.5rem;
+}
+
+.note-textarea {
+  resize: none;
+  font-family: var(--font-base);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text);
+  padding: 0.8rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  margin-bottom: 0.4rem;
+}
+
+.note-textarea::placeholder {
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
+.note-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent)22;
+}
+
+.note-char-count {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-align: right;
+  margin-bottom: 0.8rem;
+}
+
+.btn-save-note {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+/* ─── Weekly Notes History ────────────────────────────────────────────────── */
+
+.weekly-notes-history {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.weekly-note-card {
+  background: linear-gradient(135deg, var(--surface) 0%, var(--surface)77);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  padding: 0.8rem;
+  margin-bottom: 0.8rem;
+  transition: all 0.2s ease;
+}
+
+.weekly-note-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 12px var(--accent)11;
+}
+
+.note-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.6rem;
+}
+
+.note-week-label {
+  font-family: var(--font-main);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.08em;
+}
+
+.note-card-delete {
+  padding: 0.3rem 0.6rem;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.note-card-delete:hover {
+  color: #ef4444;
+}
+
+.note-feeling {
+  margin-bottom: 0.8rem;
+}
+
+.note-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.3rem;
+  text-transform: uppercase;
+}
+
+.note-content {
+  font-size: 0.85rem;
+  color: var(--text);
+  line-height: 1.4;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.note-goals {
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--border);
+}
+
+/* ─── Responsive ────────────────────────────────────────────────── */
+
+@media (max-width: 480px) {
+  .weight-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .weight-input-row {
+    flex-direction: column;
+  }
+
+  .weight-input-field {
+    width: 100%;
+  }
+
+  .btn-log-weight {
+    width: 100%;
+  }
+}

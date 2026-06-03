@@ -162,8 +162,13 @@ let STATE = {
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 
-window.addEventListener('DOMContentLoaded', () => {
-  loadState();
+window.addEventListener('DOMContentLoaded', async () => {
+  // Initialize storage system
+  await initStorageSystem();
+  
+  // Load game state
+  await loadState();
+  
   if (STATE.hunter) {
     runBootSequence(() => showApp());
   } else {
@@ -171,6 +176,16 @@ window.addEventListener('DOMContentLoaded', () => {
   }
   applyTheme(STATE.theme);
   registerSW();
+  
+  // Start auto-save
+  startAutoSave();
+  
+  // Initialize progress trackers
+  initProgressTrackers();
+  
+  // Update progress displays
+  updateWeightDisplay();
+  updateWeeklyNotesDisplay();
 });
 
 function registerSW() {
@@ -1537,17 +1552,418 @@ function showToast(msg, type = '') {
   setTimeout(() => t.remove(), 3000);
 }
 
-// ─── PERSISTENCE ─────────────────────────────────────────────────────────────
+// ─── PERSISTENCE (IndexedDB + localStorage) ───────────────────────────────────
+
+const StorageManager = {
+  dbName: 'awakenSystemDB',
+  dbVersion: 1,
+  db: null,
+
+  async initIndexedDB() {
+    return new Promise((resolve) => {
+      const request = indexedDB.open(this.dbName, this.dbVersion);
+      request.onerror = () => {
+        console.warn('⚠ IndexedDB init failed, using localStorage fallback');
+        resolve(false);
+      };
+      request.onsuccess = (event) => {
+        this.db = event.target.result;
+        console.log('✓ IndexedDB initialized');
+        resolve(true);
+      };
+      request.onupgradeneeded = (event) => {
+        const db = event.target.result;
+        if (!db.objectStoreNames.contains('playerState')) {
+          db.createObjectStore('playerState', { keyPath: 'id' });
+        }
+        if (!db.objectStoreNames.contains('progressData')) {
+          db.createObjectStore('progressData', { keyPath: 'id' });
+        }
+        if (!db.objectStoreNames.contains('backups')) {
+          db.createObjectStore('backups', { autoIncrement: true });
+        }
+      };
+    });
+  },
+
+  async saveState(state) {
+    // Save to IndexedDB (primary)
+    if (this.db) {
+      return new Promise((resolve) => {
+        try {
+          const tx = this.db.transaction(['playerState'], 'readwrite');
+          const store = tx.objectStore('playerState');
+          store.put({
+            id: 'mainState',
+            data: state,
+            timestamp: Date.now()
+          });
+          tx.oncomplete = () => {
+            console.log('✓ State saved to IndexedDB');
+            resolve(true);
+          };
+          tx.onerror = () => resolve(false);
+        } catch (e) {
+          resolve(false);
+        }
+      });
+    }
+    return false;
+  },
+
+  async loadState() {
+    // Load from IndexedDB (primary)
+    if (this.db) {
+      return new Promise((resolve) => {
+        try {
+          const tx = this.db.transaction(['playerState'], 'readonly');
+          const store = tx.objectStore('playerState');
+          const request = store.get('mainState');
+          request.onsuccess = () => {
+            const result = request.result;
+            if (result) {
+              console.log('✓ State loaded from IndexedDB');
+              resolve(result.data);
+            } else {
+              resolve(null);
+            }
+          };
+          request.onerror = () => resolve(null);
+        } catch (e) {
+          resolve(null);
+        }
+      });
+    }
+    return null;
+  },
+
+  async saveProgress(entry) {
+    if (this.db) {
+      return new Promise((resolve) => {
+        try {
+          const tx = this.db.transaction(['progressData'], 'readwrite');
+          const store = tx.objectStore('progressData');
+          store.put({
+            id: entry.id,
+            ...entry,
+            timestamp: Date.now()
+          });
+          tx.oncomplete = () => resolve(true);
+          tx.onerror = () => resolve(false);
+        } catch (e) {
+          resolve(false);
+        }
+      });
+    }
+    return false;
+  },
+
+  async loadProgress() {
+    if (this.db) {
+      return new Promise((resolve) => {
+        try {
+          const tx = this.db.transaction(['progressData'], 'readonly');
+          const store = tx.objectStore('progressData');
+          const request = store.getAll();
+          request.onsuccess = () => {
+            const entries = request.result;
+            console.log(`✓ Loaded ${entries.length} progress entries`);
+            resolve({ entries });
+          };
+          request.onerror = () => resolve({ entries: [] });
+        } catch (e) {
+          resolve({ entries: [] });
+        }
+      });
+    }
+    return { entries: [] };
+  }
+};
+
+let PROGRESS_DATA = { entries: [] };
+
+async function loadProgressData() {
+  PROGRESS_DATA = await StorageManager.loadProgress();
+}
 
 function saveState() {
+  // Save to IndexedDB and localStorage
+  StorageManager.saveState(STATE);
   try { localStorage.setItem('awakenState', JSON.stringify(STATE)); } catch(e) {}
 }
 
-function loadState() {
-  try {
-    const raw = localStorage.getItem('awakenState');
-    if (raw) STATE = { ...STATE, ...JSON.parse(raw) };
-  } catch(e) {}
+async function loadState() {
+  // Try IndexedDB first, fallback to localStorage
+  let savedState = await StorageManager.loadState();
+  
+  if (!savedState) {
+    try {
+      const raw = localStorage.getItem('awakenState');
+      if (raw) savedState = JSON.parse(raw);
+    } catch(e) {}
+  }
+  
+  if (savedState) {
+    STATE = { ...STATE, ...savedState };
+    console.log('✓ Hunter state restored');
+  }
+}
+
+// ─── TRACK PROGRESS FUNCTIONS ─────────────────────────────────────────────────
+
+function logWeightEntry() {
+  const weightInput = document.getElementById('weightInput');
+  const weight = parseFloat(weightInput.value);
+
+  if (!weight || weight < 20 || weight > 300) {
+    showNotification('❌ Enter valid weight (20-300 kg)', 'error');
+    return;
+  }
+
+  const today = new Date().toISOString().split('T')[0];
+  const entry = {
+    id: `weight-${today}`,
+    type: 'weight',
+    weight: weight,
+    date: today,
+    timestamp: Date.now()
+  };
+
+  StorageManager.saveProgress(entry);
+  PROGRESS_DATA.entries.push(entry);
+  
+  weightInput.value = '';
+  updateWeightDisplay();
+  showNotification('✓ Weight logged!', 'success');
+  if (typeof playSound === 'function') playSound('success');
+}
+
+async function saveWeeklyNote() {
+  const noteInput = document.getElementById('weeklyNoteInput');
+  const goalsInput = document.getElementById('weeklyGoalsInput');
+  
+  const note = noteInput.value.trim();
+  const goals = goalsInput.value.trim();
+
+  if (!note && !goals) {
+    showNotification('❌ Add a note or goal', 'error');
+    return;
+  }
+
+  const today = new Date();
+  const weekNum = Math.ceil((today.getDate() + new Date(today.getFullYear(), 0, 1).getDay()) / 7);
+  const weekId = `${today.getFullYear()}-W${String(weekNum).padStart(2, '0')}`;
+
+  const entry = {
+    id: `note-${weekId}`,
+    type: 'weekly_note',
+    week: weekId,
+    date: today.toISOString().split('T')[0],
+    note: note,
+    goals: goals,
+    timestamp: Date.now()
+  };
+
+  await StorageManager.saveProgress(entry);
+  PROGRESS_DATA.entries = PROGRESS_DATA.entries.filter(e => e.id !== entry.id);
+  PROGRESS_DATA.entries.push(entry);
+
+  noteInput.value = '';
+  goalsInput.value = '';
+  document.getElementById('noteCharCount').textContent = '0';
+  document.getElementById('goalsCharCount').textContent = '0';
+  updateWeeklyNotesDisplay();
+  showNotification('✓ Weekly note saved!', 'success');
+  if (typeof playSound === 'function') playSound('success');
+}
+
+function updateWeightDisplay() {
+  const weightEntries = PROGRESS_DATA.entries.filter(e => e.type === 'weight');
+
+  if (weightEntries.length === 0) {
+    const container = document.getElementById('weightChartContainer');
+    if (container) container.style.display = 'none';
+    const history = document.getElementById('weightHistory');
+    if (history) history.innerHTML = `
+      <div class="history-empty">
+        <span class="empty-icon">📋</span>
+        <span class="empty-text">NO WEIGHT LOG YET</span>
+        <span class="empty-sub">Start tracking to see your progress</span>
+      </div>
+    `;
+    return;
+  }
+
+  weightEntries.sort((a, b) => new Date(a.date) - new Date(b.date));
+  const last30 = weightEntries.slice(-30);
+  const weights = last30.map(e => e.weight);
+  const minWeight = Math.min(...weights);
+  const maxWeight = Math.max(...weights);
+  const range = maxWeight - minWeight || 1;
+
+  const container = document.getElementById('weightChartContainer');
+  if (container) container.style.display = 'block';
+
+  const chartHtml = last30.map((entry, idx) => {
+    const percent = ((entry.weight - minWeight) / range) * 100;
+    const tooltip = `${entry.date}: ${entry.weight}kg`;
+    return `
+      <div class="weight-bar" style="height: ${Math.max(10, percent + 20)}px;" title="${tooltip}">
+        <div class="weight-bar-label">${idx % 5 === 0 ? entry.weight.toFixed(1) : ''}</div>
+      </div>
+    `;
+  }).join('');
+
+  const chartEl = document.getElementById('weightChart');
+  if (chartEl) chartEl.innerHTML = chartHtml;
+
+  const current = weightEntries[weightEntries.length - 1].weight;
+  const lowest = minWeight;
+  const highest = maxWeight;
+  const change = current - weightEntries[0].weight;
+
+  const wc = document.getElementById('weightCurrent');
+  if (wc) wc.textContent = current.toFixed(1) + ' kg';
+  const wl = document.getElementById('weightLowest');
+  if (wl) wl.textContent = lowest.toFixed(1) + ' kg';
+  const wh = document.getElementById('weightHighest');
+  if (wh) wh.textContent = highest.toFixed(1) + ' kg';
+  const wch = document.getElementById('weightChange');
+  if (wch) wch.textContent = (change >= 0 ? '+' : '') + change.toFixed(1) + ' kg';
+
+  const historyHtml = weightEntries.slice().reverse().map((entry, idx) => `
+    <div class="weight-entry">
+      <div class="weight-entry-left">
+        <div class="weight-entry-date">${entry.date}</div>
+        <div class="weight-entry-weight">${entry.weight}kg</div>
+      </div>
+      <div class="weight-entry-right">
+        ${idx > 0 ? `<span style="color: ${entry.weight < weightEntries[weightEntries.length - 2 - idx].weight ? '#22c55e' : '#ef4444'}; font-size: 0.8rem;">
+          ${entry.weight < weightEntries[weightEntries.length - 2 - idx].weight ? '↓' : '↑'} ${Math.abs(entry.weight - weightEntries[weightEntries.length - 2 - idx].weight).toFixed(1)}kg
+        </span>` : ''}
+        <button class="weight-entry-delete" onclick="deleteWeightEntry('${entry.id}')">DELETE</button>
+      </div>
+    </div>
+  `).join('');
+
+  const historyEl = document.getElementById('weightHistory');
+  if (historyEl) historyEl.innerHTML = historyHtml;
+}
+
+function deleteWeightEntry(entryId) {
+  if (!confirm('Delete this entry?')) return;
+  PROGRESS_DATA.entries = PROGRESS_DATA.entries.filter(e => e.id !== entryId);
+  StorageManager.saveProgress({ id: entryId, deleted: true });
+  updateWeightDisplay();
+  showNotification('✓ Entry deleted', 'success');
+}
+
+function updateWeeklyNotesDisplay() {
+  const noteEntries = PROGRESS_DATA.entries.filter(e => e.type === 'weekly_note');
+
+  if (noteEntries.length === 0) {
+    const container = document.getElementById('weeklyNotesHistory');
+    if (container) container.innerHTML = `
+      <div class="history-empty">
+        <span class="empty-icon">📔</span>
+        <span class="empty-text">NO WEEKLY NOTES YET</span>
+        <span class="empty-sub">Start journaling your progress</span>
+      </div>
+    `;
+    return;
+  }
+
+  noteEntries.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  const historyHtml = noteEntries.map(entry => `
+    <div class="weekly-note-card">
+      <div class="note-card-header">
+        <span class="note-week-label">WEEK ${entry.week}</span>
+        <button class="note-card-delete" onclick="deleteWeeklyNote('${entry.id}')">✕</button>
+      </div>
+      ${entry.note ? `
+        <div class="note-feeling">
+          <div class="note-label">HOW YOU FELT</div>
+          <div class="note-content">${entry.note}</div>
+        </div>
+      ` : ''}
+      ${entry.goals ? `
+        <div class="note-goals">
+          <div class="note-label">NEXT WEEK'S GOALS</div>
+          <div class="note-content">${entry.goals}</div>
+        </div>
+      ` : ''}
+    </div>
+  `).join('');
+
+  const container = document.getElementById('weeklyNotesHistory');
+  if (container) container.innerHTML = historyHtml;
+}
+
+function deleteWeeklyNote(entryId) {
+  if (!confirm('Delete this note?')) return;
+  PROGRESS_DATA.entries = PROGRESS_DATA.entries.filter(e => e.id !== entryId);
+  StorageManager.saveProgress({ id: entryId, deleted: true });
+  updateWeeklyNotesDisplay();
+  showNotification('✓ Note deleted', 'success');
+}
+
+function switchProgressTab(tab, event) {
+  if (event) event.preventDefault();
+  
+  document.querySelectorAll('.progress-tab-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  event.target.closest('.progress-tab-btn').classList.add('active');
+
+  document.querySelectorAll('.progress-tab-content').forEach(content => {
+    content.classList.remove('active');
+  });
+  document.getElementById(`progress-${tab}-tab`).classList.add('active');
+}
+
+// Character counters
+function initProgressTrackers() {
+  const noteInput = document.getElementById('weeklyNoteInput');
+  const goalsInput = document.getElementById('weeklyGoalsInput');
+
+  if (noteInput) {
+    noteInput.addEventListener('input', (e) => {
+      const counter = document.getElementById('noteCharCount');
+      if (counter) counter.textContent = e.target.value.length;
+    });
+  }
+
+  if (goalsInput) {
+    goalsInput.addEventListener('input', (e) => {
+      const counter = document.getElementById('goalsCharCount');
+      if (counter) counter.textContent = e.target.value.length;
+    });
+  }
+}
+
+// ─── AUTO-SAVE SYSTEM ──────────────────────────────────────────────────────────
+
+async function initStorageSystem() {
+  await StorageManager.initIndexedDB();
+  await loadProgressData();
+  return true;
+}
+
+function startAutoSave() {
+  setInterval(() => {
+    saveState();
+  }, 30000);
+  
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) saveState();
+  });
+  
+  window.addEventListener('beforeunload', () => {
+    saveState();
+  });
+  
+  console.log('✓ Auto-save started');
 }
 
 // ─── UTILS ────────────────────────────────────────────────────────────────────

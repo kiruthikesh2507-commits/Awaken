@@ -373,6 +373,114 @@
         <div class="mini-stats" id="miniStats"></div>
       </div>
 
+      <!-- TRACK PROGRESS SECTION -->
+      <div class="section-card track-progress-card">
+        <div class="section-label">PROGRESS TRACKER</div>
+        
+        <!-- Progress Menu Tabs -->
+        <div class="progress-tabs">
+          <button class="progress-tab-btn active" onclick="switchProgressTab('weight', event)">
+            <span class="progress-icon">📊</span> WEIGHT
+          </button>
+          <button class="progress-tab-btn" onclick="switchProgressTab('notes', event)">
+            <span class="progress-icon">📝</span> NOTES
+          </button>
+        </div>
+
+        <!-- Weight Tab -->
+        <div class="progress-tab-content active" id="progress-weight-tab">
+          <div class="weight-input-group">
+            <div class="weight-input-row">
+              <div class="form-group weight-input-field">
+                <label class="form-label">CURRENT WEIGHT (kg)</label>
+                <input type="number" id="weightInput" class="form-input weight-input" placeholder="75.5" step="0.1" min="20" max="300" />
+              </div>
+              <button class="btn-primary btn-log-weight" onclick="logWeightEntry()">
+                <span class="btn-icon">✓</span> LOG
+              </button>
+            </div>
+          </div>
+
+          <!-- Weight Chart -->
+          <div class="weight-chart-container" id="weightChartContainer" style="display:none;">
+            <div class="weight-chart-header">
+              <span class="chart-title">WEIGHT TREND</span>
+              <span class="chart-days" id="chartDays">(Last 30 days)</span>
+            </div>
+            <div class="weight-chart" id="weightChart"></div>
+            <div class="weight-stats">
+              <div class="weight-stat">
+                <span class="stat-label">CURRENT:</span>
+                <span class="stat-value" id="weightCurrent">--</span>
+              </div>
+              <div class="weight-stat">
+                <span class="stat-label">LOWEST:</span>
+                <span class="stat-value" id="weightLowest">--</span>
+              </div>
+              <div class="weight-stat">
+                <span class="stat-label">HIGHEST:</span>
+                <span class="stat-value" id="weightHighest">--</span>
+              </div>
+              <div class="weight-stat">
+                <span class="stat-label">CHANGE:</span>
+                <span class="stat-value" id="weightChange">--</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Weight History -->
+          <div class="weight-history" id="weightHistory">
+            <div class="history-empty">
+              <span class="empty-icon">📋</span>
+              <span class="empty-text">NO WEIGHT LOG YET</span>
+              <span class="empty-sub">Start tracking to see your progress</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notes Tab -->
+        <div class="progress-tab-content" id="progress-notes-tab">
+          <div class="weekly-note-input">
+            <label class="form-label">HOW DO YOU FEEL THIS WEEK?</label>
+            <textarea 
+              id="weeklyNoteInput" 
+              class="form-input note-textarea" 
+              placeholder="Record your mood, energy levels, challenges, and victories this week..."
+              rows="4"
+              maxlength="500"
+            ></textarea>
+            <div class="note-char-count">
+              <span id="noteCharCount">0</span>/500
+            </div>
+
+            <label class="form-label" style="margin-top: 1rem;">GOALS FOR NEXT WEEK</label>
+            <textarea 
+              id="weeklyGoalsInput" 
+              class="form-input note-textarea" 
+              placeholder="What do you want to accomplish next week? Set specific, achievable goals..."
+              rows="3"
+              maxlength="300"
+            ></textarea>
+            <div class="note-char-count">
+              <span id="goalsCharCount">0</span>/300
+            </div>
+
+            <button class="btn-primary btn-save-note" onclick="saveWeeklyNote()">
+              <span class="btn-icon">💾</span> SAVE WEEKLY NOTE
+            </button>
+          </div>
+
+          <!-- Weekly Notes History -->
+          <div class="weekly-notes-history" id="weeklyNotesHistory">
+            <div class="history-empty">
+              <span class="empty-icon">📔</span>
+              <span class="empty-text">NO WEEKLY NOTES YET</span>
+              <span class="empty-sub">Start journaling your progress</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Generate Quests -->
       <button class="btn-generate" id="btnGenerate" onclick="generateDailyQuests()">
         <span class="btn-gen-icon">⟳</span>
