@@ -1855,7 +1855,86 @@ function deleteWeightEntry(entryId) {
   PROGRESS_DATA.entries = PROGRESS_DATA.entries.filter(e => e.id !== entryId);
   StorageManager.saveProgress({ id: entryId, deleted: true });
   updateWeightDisplay();
+  updateWeightLogHistory(); // Update modal if open
   showNotification('✓ Entry deleted', 'success');
+}
+
+// ← NEW FUNCTION: Open Weight Log Modal
+function openWeightLogModal() {
+  const modal = document.getElementById('weightLogModal');
+  if (modal) {
+    modal.classList.add('active');
+    updateWeightLogHistory();
+  }
+}
+
+// ← NEW FUNCTION: Close Weight Log Modal
+function closeWeightLogModal() {
+  const modal = document.getElementById('weightLogModal');
+  if (modal) {
+    modal.classList.remove('active');
+  }
+}
+
+// ← NEW FUNCTION: Update Weight Log History (inside modal)
+function updateWeightLogHistory() {
+  const weightEntries = PROGRESS_DATA.entries.filter(e => e.type === 'weight');
+  const container = document.getElementById('weightLogList');
+
+  if (!container) return;
+
+  if (weightEntries.length === 0) {
+    container.innerHTML = `
+      <div class="log-empty">
+        <span class="empty-icon">📋</span>
+        <span class="empty-text">NO WEIGHT LOG YET</span>
+        <span class="empty-sub">Start tracking to see your history</span>
+      </div>
+    `;
+    return;
+  }
+
+  // Sort by date descending (newest first)
+  weightEntries.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  // Format date for display
+  const formatDate = (dateStr) => {
+    const date = new Date(dateStr);
+    const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+    const dayName = days[date.getDay()];
+    return `${dayName} ${dateStr}`;
+  };
+
+  // Generate HTML for each entry with date
+  const logHtml = weightEntries.map((entry, idx) => {
+    let changeText = '';
+    
+    // Calculate change from previous entry
+    if (idx < weightEntries.length - 1) {
+      const prevEntry = weightEntries[idx + 1];
+      const change = entry.weight - prevEntry.weight;
+      const changeStr = change.toFixed(1);
+      const direction = change < 0 ? '↓' : change > 0 ? '↑' : '→';
+      const color = change < 0 ? '#22c55e' : change > 0 ? '#ef4444' : 'var(--text-muted)';
+      changeText = `<div class="weight-log-change" style="color: ${color};">${direction} ${Math.abs(change).toFixed(1)}kg</div>`;
+    }
+
+    return `
+      <div class="weight-log-entry">
+        <div class="weight-log-entry-left">
+          <div class="weight-log-date">
+            <span class="weight-log-date-icon">📅</span>
+            <span>${formatDate(entry.date)}</span>
+          </div>
+          <div class="weight-log-weight">${entry.weight} kg</div>
+          ${changeText}
+        </div>
+        <button class="weight-log-delete" onclick="deleteWeightEntry('${entry.id}')">DELETE</button>
+      </div>
+    `;
+  }).join('');
+
+  container.innerHTML = logHtml;
 }
 
 function updateWeeklyNotesDisplay() {

@@ -1747,11 +1747,259 @@ html, body {
   font-family: var(--font-mono);
 }
 
-/* ─── Weight History ────────────────────────────────────────────────── */
+/* ─── Weight History (in tabs) ────────────────────────────────────────────────── */
 
 .weight-history {
   max-height: 300px;
   overflow-y: auto;
+}
+
+/* ─── Weight Log Modal ────────────────────────────────────────────────── */
+
+.weight-log-button-container {
+  display: flex;
+  gap: 0.8rem;
+  margin: 1rem 1rem;
+  margin-bottom: 0;
+}
+
+.btn-view-log {
+  flex: 1;
+  padding: 0.7rem 1rem;
+  background: linear-gradient(135deg, var(--accent)22, var(--accent)11);
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  color: var(--accent);
+  font-family: var(--font-main);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-view-log:hover {
+  background: linear-gradient(135deg, var(--accent)33, var(--accent)22);
+  box-shadow: 0 0 15px var(--accent)33;
+}
+
+.btn-view-log:active {
+  transform: scale(0.98);
+}
+
+/* ─── Modal Styles ────────────────────────────────────────────────── */
+
+.weight-log-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.weight-log-modal.active {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+}
+
+.modal-content {
+  position: relative;
+  background: var(--bg);
+  border-radius: 12px 12px 0 0;
+  max-height: 80vh;
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s ease;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.2rem;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(135deg, var(--surface) 0%, var(--surface)77);
+}
+
+.modal-title {
+  font-family: var(--font-main);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.08em;
+}
+
+.modal-close {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.3rem 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  color: var(--text);
+  transform: scale(1.1);
+}
+
+.modal-body {
+  overflow-y: auto;
+  flex: 1;
+  padding: 1rem;
+}
+
+.weight-log-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+/* ─── Weight Log Entry ────────────────────────────────────────────────── */
+
+.weight-log-entry {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem;
+  background: linear-gradient(135deg, var(--surface) 0%, var(--surface)77);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.weight-log-entry:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 12px var(--accent)11;
+  transform: translateX(2px);
+}
+
+.weight-log-entry-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  flex: 1;
+}
+
+.weight-log-date {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  letter-spacing: 0.05em;
+}
+
+.weight-log-date-icon {
+  font-size: 0.9rem;
+}
+
+.weight-log-weight {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent);
+  font-family: var(--font-mono);
+}
+
+.weight-log-change {
+  font-size: 0.8rem;
+  margin-top: 0.2rem;
+  opacity: 0.8;
+}
+
+.weight-log-entry-right {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.weight-log-delete {
+  padding: 0.4rem 0.7rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 600;
+}
+
+.weight-log-delete:hover {
+  border-color: #ef4444;
+  color: #ef4444;
+  background: #ef444411;
+}
+
+.log-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 3rem 1rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.log-empty .empty-icon {
+  font-size: 3rem;
+  opacity: 0.3;
+}
+
+.log-empty .empty-text {
+  font-family: var(--font-main);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.log-empty .empty-sub {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  opacity: 0.8;
 }
 
 .weight-entry {

@@ -427,15 +427,6 @@
               </div>
             </div>
           </div>
-
-          <!-- Weight History -->
-          <div class="weight-history" id="weightHistory">
-            <div class="history-empty">
-              <span class="empty-icon">📋</span>
-              <span class="empty-text">NO WEIGHT LOG YET</span>
-              <span class="empty-sub">Start tracking to see your progress</span>
-            </div>
-          </div>
         </div>
 
         <!-- Notes Tab -->
@@ -479,6 +470,13 @@
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- WEIGHT LOG BUTTON - Opens Modal -->
+      <div class="weight-log-button-container">
+        <button class="btn-view-log" onclick="openWeightLogModal()">
+          <span class="btn-icon">📋</span> SEE LOG
+        </button>
       </div>
 
       <!-- Generate Quests -->
@@ -755,6 +753,26 @@
 <script src="quests.js"></script>
 <script src="app.js"></script>
 <script src="features.js"></script>
-<script src="sfx.js"></script>
+<script src="sfx.js"></script>  <!-- WEIGHT LOG MODAL -->
+  <div class="weight-log-modal" id="weightLogModal">
+    <div class="modal-overlay" onclick="closeWeightLogModal()"></div>
+    <div class="modal-content weight-log-modal-content">
+      <div class="modal-header">
+        <span class="modal-title">📋 WEIGHT LOG</span>
+        <button class="modal-close" onclick="closeWeightLogModal()">✕</button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="weight-log-list" id="weightLogList">
+          <div class="log-empty">
+            <span class="empty-icon">📋</span>
+            <span class="empty-text">NO WEIGHT LOG YET</span>
+            <span class="empty-sub">Start tracking to see your history</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
