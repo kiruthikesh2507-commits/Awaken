@@ -163,12 +163,8 @@ let STATE = {
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 
 window.addEventListener('DOMContentLoaded', async () => {
-  // Initialize storage system
   await initStorageSystem();
-  
-  // Load game state
   await loadState();
-  
   if (STATE.hunter) {
     runBootSequence(() => showApp());
   } else {
@@ -176,14 +172,8 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
   applyTheme(STATE.theme);
   registerSW();
-  
-  // Start auto-save
   startAutoSave();
-  
-  // Initialize progress trackers
   initProgressTrackers();
-  
-  // Update progress displays
   updateWeightDisplay();
   updateWeeklyNotesDisplay();
 });
@@ -1579,40 +1569,26 @@ const StorageManager = {
         if (!db.objectStoreNames.contains('progressData')) {
           db.createObjectStore('progressData', { keyPath: 'id' });
         }
-        if (!db.objectStoreNames.contains('backups')) {
-          db.createObjectStore('backups', { autoIncrement: true });
-        }
       };
     });
   },
 
   async saveState(state) {
-    // Save to IndexedDB (primary)
     if (this.db) {
       return new Promise((resolve) => {
         try {
           const tx = this.db.transaction(['playerState'], 'readwrite');
           const store = tx.objectStore('playerState');
-          store.put({
-            id: 'mainState',
-            data: state,
-            timestamp: Date.now()
-          });
-          tx.oncomplete = () => {
-            console.log('✓ State saved to IndexedDB');
-            resolve(true);
-          };
+          store.put({ id: 'mainState', data: state, timestamp: Date.now() });
+          tx.oncomplete = () => resolve(true);
           tx.onerror = () => resolve(false);
-        } catch (e) {
-          resolve(false);
-        }
+        } catch (e) { resolve(false); }
       });
     }
     return false;
   },
 
   async loadState() {
-    // Load from IndexedDB (primary)
     if (this.db) {
       return new Promise((resolve) => {
         try {
@@ -1621,17 +1597,10 @@ const StorageManager = {
           const request = store.get('mainState');
           request.onsuccess = () => {
             const result = request.result;
-            if (result) {
-              console.log('✓ State loaded from IndexedDB');
-              resolve(result.data);
-            } else {
-              resolve(null);
-            }
+            resolve(result ? result.data : null);
           };
           request.onerror = () => resolve(null);
-        } catch (e) {
-          resolve(null);
-        }
+        } catch (e) { resolve(null); }
       });
     }
     return null;
@@ -1643,16 +1612,10 @@ const StorageManager = {
         try {
           const tx = this.db.transaction(['progressData'], 'readwrite');
           const store = tx.objectStore('progressData');
-          store.put({
-            id: entry.id,
-            ...entry,
-            timestamp: Date.now()
-          });
+          store.put({ id: entry.id, ...entry, timestamp: Date.now() });
           tx.oncomplete = () => resolve(true);
           tx.onerror = () => resolve(false);
-        } catch (e) {
-          resolve(false);
-        }
+        } catch (e) { resolve(false); }
       });
     }
     return false;
@@ -1665,15 +1628,9 @@ const StorageManager = {
           const tx = this.db.transaction(['progressData'], 'readonly');
           const store = tx.objectStore('progressData');
           const request = store.getAll();
-          request.onsuccess = () => {
-            const entries = request.result;
-            console.log(`✓ Loaded ${entries.length} progress entries`);
-            resolve({ entries });
-          };
+          request.onsuccess = () => resolve({ entries: request.result });
           request.onerror = () => resolve({ entries: [] });
-        } catch (e) {
-          resolve({ entries: [] });
-        }
+        } catch (e) { resolve({ entries: [] }); }
       });
     }
     return { entries: [] };
@@ -1687,26 +1644,28 @@ async function loadProgressData() {
 }
 
 function saveState() {
-  // Save to IndexedDB and localStorage
   StorageManager.saveState(STATE);
   try { localStorage.setItem('awakenState', JSON.stringify(STATE)); } catch(e) {}
 }
 
 async function loadState() {
-  // Try IndexedDB first, fallback to localStorage
   let savedState = await StorageManager.loadState();
-  
   if (!savedState) {
     try {
       const raw = localStorage.getItem('awakenState');
       if (raw) savedState = JSON.parse(raw);
     } catch(e) {}
   }
-  
   if (savedState) {
     STATE = { ...STATE, ...savedState };
     console.log('✓ Hunter state restored');
   }
+}
+
+// ─── UTILS ────────────────────────────────────────────────────────────────────
+
+function getTodayStr() {
+  return new Date().toISOString().split('T')[0];
 }
 
 // ─── TRACK PROGRESS FUNCTIONS ─────────────────────────────────────────────────
@@ -1783,14 +1742,6 @@ function updateWeightDisplay() {
   if (weightEntries.length === 0) {
     const container = document.getElementById('weightChartContainer');
     if (container) container.style.display = 'none';
-    const history = document.getElementById('weightHistory');
-    if (history) history.innerHTML = `
-      <div class="history-empty">
-        <span class="empty-icon">📋</span>
-        <span class="empty-text">NO WEIGHT LOG YET</span>
-        <span class="empty-sub">Start tracking to see your progress</span>
-      </div>
-    `;
     return;
   }
 
@@ -1806,48 +1757,23 @@ function updateWeightDisplay() {
 
   const chartHtml = last30.map((entry, idx) => {
     const percent = ((entry.weight - minWeight) / range) * 100;
-    const tooltip = `${entry.date}: ${entry.weight}kg`;
-    return `
-      <div class="weight-bar" style="height: ${Math.max(10, percent + 20)}px;" title="${tooltip}">
-        <div class="weight-bar-label">${idx % 5 === 0 ? entry.weight.toFixed(1) : ''}</div>
-      </div>
-    `;
+    return `<div class="weight-bar" style="height: ${Math.max(10, percent + 20)}px;" title="${entry.date}: ${entry.weight}kg"><div class="weight-bar-label">${idx % 5 === 0 ? entry.weight.toFixed(1) : ''}</div></div>`;
   }).join('');
 
   const chartEl = document.getElementById('weightChart');
   if (chartEl) chartEl.innerHTML = chartHtml;
 
   const current = weightEntries[weightEntries.length - 1].weight;
-  const lowest = minWeight;
-  const highest = maxWeight;
   const change = current - weightEntries[0].weight;
 
   const wc = document.getElementById('weightCurrent');
   if (wc) wc.textContent = current.toFixed(1) + ' kg';
   const wl = document.getElementById('weightLowest');
-  if (wl) wl.textContent = lowest.toFixed(1) + ' kg';
+  if (wl) wl.textContent = Math.min(...weights).toFixed(1) + ' kg';
   const wh = document.getElementById('weightHighest');
-  if (wh) wh.textContent = highest.toFixed(1) + ' kg';
+  if (wh) wh.textContent = Math.max(...weights).toFixed(1) + ' kg';
   const wch = document.getElementById('weightChange');
   if (wch) wch.textContent = (change >= 0 ? '+' : '') + change.toFixed(1) + ' kg';
-
-  const historyHtml = weightEntries.slice().reverse().map((entry, idx) => `
-    <div class="weight-entry">
-      <div class="weight-entry-left">
-        <div class="weight-entry-date">${entry.date}</div>
-        <div class="weight-entry-weight">${entry.weight}kg</div>
-      </div>
-      <div class="weight-entry-right">
-        ${idx > 0 ? `<span style="color: ${entry.weight < weightEntries[weightEntries.length - 2 - idx].weight ? '#22c55e' : '#ef4444'}; font-size: 0.8rem;">
-          ${entry.weight < weightEntries[weightEntries.length - 2 - idx].weight ? '↓' : '↑'} ${Math.abs(entry.weight - weightEntries[weightEntries.length - 2 - idx].weight).toFixed(1)}kg
-        </span>` : ''}
-        <button class="weight-entry-delete" onclick="deleteWeightEntry('${entry.id}')">DELETE</button>
-      </div>
-    </div>
-  `).join('');
-
-  const historyEl = document.getElementById('weightHistory');
-  if (historyEl) historyEl.innerHTML = historyHtml;
 }
 
 function deleteWeightEntry(entryId) {
@@ -1855,86 +1781,8 @@ function deleteWeightEntry(entryId) {
   PROGRESS_DATA.entries = PROGRESS_DATA.entries.filter(e => e.id !== entryId);
   StorageManager.saveProgress({ id: entryId, deleted: true });
   updateWeightDisplay();
-  updateWeightLogHistory(); // Update modal if open
+  updateWeightLogHistory();
   showNotification('✓ Entry deleted', 'success');
-}
-
-// ← NEW FUNCTION: Open Weight Log Modal
-function openWeightLogModal() {
-  const modal = document.getElementById('weightLogModal');
-  if (modal) {
-    modal.classList.add('active');
-    updateWeightLogHistory();
-  }
-}
-
-// ← NEW FUNCTION: Close Weight Log Modal
-function closeWeightLogModal() {
-  const modal = document.getElementById('weightLogModal');
-  if (modal) {
-    modal.classList.remove('active');
-  }
-}
-
-// ← NEW FUNCTION: Update Weight Log History (inside modal)
-function updateWeightLogHistory() {
-  const weightEntries = PROGRESS_DATA.entries.filter(e => e.type === 'weight');
-  const container = document.getElementById('weightLogList');
-
-  if (!container) return;
-
-  if (weightEntries.length === 0) {
-    container.innerHTML = `
-      <div class="log-empty">
-        <span class="empty-icon">📋</span>
-        <span class="empty-text">NO WEIGHT LOG YET</span>
-        <span class="empty-sub">Start tracking to see your history</span>
-      </div>
-    `;
-    return;
-  }
-
-  // Sort by date descending (newest first)
-  weightEntries.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-  // Format date for display
-  const formatDate = (dateStr) => {
-    const date = new Date(dateStr);
-    const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
-    const dayName = days[date.getDay()];
-    return `${dayName} ${dateStr}`;
-  };
-
-  // Generate HTML for each entry with date
-  const logHtml = weightEntries.map((entry, idx) => {
-    let changeText = '';
-    
-    // Calculate change from previous entry
-    if (idx < weightEntries.length - 1) {
-      const prevEntry = weightEntries[idx + 1];
-      const change = entry.weight - prevEntry.weight;
-      const changeStr = change.toFixed(1);
-      const direction = change < 0 ? '↓' : change > 0 ? '↑' : '→';
-      const color = change < 0 ? '#22c55e' : change > 0 ? '#ef4444' : 'var(--text-muted)';
-      changeText = `<div class="weight-log-change" style="color: ${color};">${direction} ${Math.abs(change).toFixed(1)}kg</div>`;
-    }
-
-    return `
-      <div class="weight-log-entry">
-        <div class="weight-log-entry-left">
-          <div class="weight-log-date">
-            <span class="weight-log-date-icon">📅</span>
-            <span>${formatDate(entry.date)}</span>
-          </div>
-          <div class="weight-log-weight">${entry.weight} kg</div>
-          ${changeText}
-        </div>
-        <button class="weight-log-delete" onclick="deleteWeightEntry('${entry.id}')">DELETE</button>
-      </div>
-    `;
-  }).join('');
-
-  container.innerHTML = logHtml;
 }
 
 function updateWeeklyNotesDisplay() {
@@ -1942,13 +1790,7 @@ function updateWeeklyNotesDisplay() {
 
   if (noteEntries.length === 0) {
     const container = document.getElementById('weeklyNotesHistory');
-    if (container) container.innerHTML = `
-      <div class="history-empty">
-        <span class="empty-icon">📔</span>
-        <span class="empty-text">NO WEEKLY NOTES YET</span>
-        <span class="empty-sub">Start journaling your progress</span>
-      </div>
-    `;
+    if (container) container.innerHTML = `<div class="history-empty"><span class="empty-icon">📔</span><span class="empty-text">NO WEEKLY NOTES YET</span><span class="empty-sub">Start journaling your progress</span></div>`;
     return;
   }
 
@@ -1960,18 +1802,8 @@ function updateWeeklyNotesDisplay() {
         <span class="note-week-label">WEEK ${entry.week}</span>
         <button class="note-card-delete" onclick="deleteWeeklyNote('${entry.id}')">✕</button>
       </div>
-      ${entry.note ? `
-        <div class="note-feeling">
-          <div class="note-label">HOW YOU FELT</div>
-          <div class="note-content">${entry.note}</div>
-        </div>
-      ` : ''}
-      ${entry.goals ? `
-        <div class="note-goals">
-          <div class="note-label">NEXT WEEK'S GOALS</div>
-          <div class="note-content">${entry.goals}</div>
-        </div>
-      ` : ''}
+      ${entry.note ? `<div class="note-feeling"><div class="note-label">HOW YOU FELT</div><div class="note-content">${entry.note}</div></div>` : ''}
+      ${entry.goals ? `<div class="note-goals"><div class="note-label">NEXT WEEK'S GOALS</div><div class="note-content">${entry.goals}</div></div>` : ''}
     </div>
   `).join('');
 
@@ -2001,7 +1833,6 @@ function switchProgressTab(tab, event) {
   document.getElementById(`progress-${tab}-tab`).classList.add('active');
 }
 
-// Character counters
 function initProgressTrackers() {
   const noteInput = document.getElementById('weeklyNoteInput');
   const goalsInput = document.getElementById('weeklyGoalsInput');
@@ -2021,7 +1852,66 @@ function initProgressTrackers() {
   }
 }
 
-// ─── AUTO-SAVE SYSTEM ──────────────────────────────────────────────────────────
+// Modal Functions
+function openWeightLogModal() {
+  const modal = document.getElementById('weightLogModal');
+  if (modal) {
+    modal.classList.add('active');
+    updateWeightLogHistory();
+  }
+}
+
+function closeWeightLogModal() {
+  const modal = document.getElementById('weightLogModal');
+  if (modal) {
+    modal.classList.remove('active');
+  }
+}
+
+function updateWeightLogHistory() {
+  const weightEntries = PROGRESS_DATA.entries.filter(e => e.type === 'weight');
+  const container = document.getElementById('weightLogList');
+
+  if (!container) return;
+
+  if (weightEntries.length === 0) {
+    container.innerHTML = `<div class="log-empty"><span class="empty-icon">📋</span><span class="empty-text">NO WEIGHT LOG YET</span><span class="empty-sub">Start tracking to see your history</span></div>`;
+    return;
+  }
+
+  weightEntries.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  const formatDate = (dateStr) => {
+    const date = new Date(dateStr);
+    const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+    const dayName = days[date.getDay()];
+    return `${dayName} ${dateStr}`;
+  };
+
+  const logHtml = weightEntries.map((entry, idx) => {
+    let changeText = '';
+    if (idx < weightEntries.length - 1) {
+      const prevEntry = weightEntries[idx + 1];
+      const change = entry.weight - prevEntry.weight;
+      const direction = change < 0 ? '↓' : change > 0 ? '↑' : '→';
+      const color = change < 0 ? '#22c55e' : change > 0 ? '#ef4444' : 'var(--text-muted)';
+      changeText = `<div class="weight-log-change" style="color: ${color};">${direction} ${Math.abs(change).toFixed(1)}kg</div>`;
+    }
+
+    return `
+      <div class="weight-log-entry">
+        <div class="weight-log-entry-left">
+          <div class="weight-log-date"><span class="weight-log-date-icon">📅</span><span>${formatDate(entry.date)}</span></div>
+          <div class="weight-log-weight">${entry.weight} kg</div>
+          ${changeText}
+        </div>
+        <button class="weight-log-delete" onclick="deleteWeightEntry('${entry.id}')">DELETE</button>
+      </div>
+    `;
+  }).join('');
+
+  container.innerHTML = logHtml;
+}
 
 async function initStorageSystem() {
   await StorageManager.initIndexedDB();
@@ -2030,9 +1920,7 @@ async function initStorageSystem() {
 }
 
 function startAutoSave() {
-  setInterval(() => {
-    saveState();
-  }, 30000);
+  setInterval(() => { saveState(); }, 30000);
   
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) saveState();
@@ -2043,10 +1931,4 @@ function startAutoSave() {
   });
   
   console.log('✓ Auto-save started');
-}
-
-// ─── UTILS ────────────────────────────────────────────────────────────────────
-
-function getTodayStr() {
-  return new Date().toISOString().split('T')[0];
 }
