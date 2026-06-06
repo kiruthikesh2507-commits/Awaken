@@ -1876,6 +1876,7 @@ function updateWeightLogHistory() {
 
   if (weightEntries.length === 0) {
     container.innerHTML = `<div class="log-empty"><span class="empty-icon">📋</span><span class="empty-text">NO WEIGHT LOG YET</span><span class="empty-sub">Start tracking to see your history</span></div>`;
+    updateWeightLogCard(weightEntries);
     return;
   }
 
@@ -1911,6 +1912,34 @@ function updateWeightLogHistory() {
   }).join('');
 
   container.innerHTML = logHtml;
+  updateWeightLogCard(weightEntries);
+}
+
+// Update card stats
+function updateWeightLogCard(weightEntries) {
+  if (!weightEntries || weightEntries.length === 0) {
+    const latestEl = document.getElementById('cardLatestWeight');
+    if (latestEl) latestEl.textContent = '--';
+    const entriesEl = document.getElementById('cardTotalEntries');
+    if (entriesEl) entriesEl.textContent = '0';
+    const trendEl = document.getElementById('cardTrendValue');
+    if (trendEl) trendEl.textContent = '--';
+    return;
+  }
+
+  const sorted = weightEntries.sort((a, b) => new Date(a.date) - new Date(b.date));
+  const latest = sorted[sorted.length - 1].weight;
+  const change = latest - sorted[0].weight;
+  const direction = change < 0 ? '↓' : change > 0 ? '↑' : '';
+
+  const latestEl = document.getElementById('cardLatestWeight');
+  if (latestEl) latestEl.textContent = latest.toFixed(1) + ' kg';
+  
+  const entriesEl = document.getElementById('cardTotalEntries');
+  if (entriesEl) entriesEl.textContent = sorted.length;
+  
+  const trendEl = document.getElementById('cardTrendValue');
+  if (trendEl) trendEl.textContent = `${direction} ${Math.abs(change).toFixed(1)}kg`;
 }
 
 async function initStorageSystem() {

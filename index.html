@@ -472,10 +472,33 @@
         </div>
       </div>
 
-      <!-- SEE LOG BUTTON -->
-      <button class="btn-see-log" onclick="openWeightLogModal()">
-        <span class="btn-icon">📋</span> SEE LOG
-      </button>
+      <!-- WEIGHT LOG CARD - Professional Summary -->
+      <div class="weight-log-card">
+        <div class="card-header">
+          <span class="card-title">📋 WEIGHT LOG</span>
+        </div>
+        <div class="card-divider"></div>
+        <div class="card-body">
+          <div class="card-stats">
+            <div class="stat-item">
+              <span class="stat-label">LATEST</span>
+              <span class="stat-value" id="cardLatestWeight">--</span>
+            </div>
+            <div class="stat-divider">|</div>
+            <div class="stat-item">
+              <span class="stat-label">ENTRIES</span>
+              <span class="stat-value" id="cardTotalEntries">0</span>
+            </div>
+          </div>
+          <div class="card-trend">
+            <span class="trend-label">CHANGE:</span>
+            <span class="trend-value" id="cardTrendValue">--</span>
+          </div>
+          <button class="btn-view-log" onclick="openWeightLogModal()">
+            <span class="btn-icon">📋</span> VIEW FULL LOG
+          </button>
+        </div>
+      </div>
 
       <!-- Generate Quests -->
       <button class="btn-generate" id="btnGenerate" onclick="generateDailyQuests()">
