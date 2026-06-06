@@ -472,30 +472,21 @@
         </div>
       </div>
 
-      <!-- WEIGHT LOG CARD - Professional Summary -->
-      <div class="weight-log-card">
+      <!-- WEEKLY NOTES CARD - Professional Summary -->
+      <div class="notes-log-card">
         <div class="card-header">
-          <span class="card-title">📋 WEIGHT LOG</span>
+          <span class="card-title">📝 WEEKLY NOTES</span>
         </div>
         <div class="card-divider"></div>
         <div class="card-body">
           <div class="card-stats">
             <div class="stat-item">
-              <span class="stat-label">LATEST</span>
-              <span class="stat-value" id="cardLatestWeight">--</span>
-            </div>
-            <div class="stat-divider">|</div>
-            <div class="stat-item">
-              <span class="stat-label">ENTRIES</span>
-              <span class="stat-value" id="cardTotalEntries">0</span>
+              <span class="stat-label">SAVED NOTES</span>
+              <span class="stat-value" id="cardTotalNotes">0</span>
             </div>
           </div>
-          <div class="card-trend">
-            <span class="trend-label">CHANGE:</span>
-            <span class="trend-value" id="cardTrendValue">--</span>
-          </div>
-          <button class="btn-view-log" onclick="openWeightLogModal()">
-            <span class="btn-icon">📋</span> VIEW FULL LOG
+          <button class="btn-view-log" onclick="openNotesLogModal()">
+            <span class="btn-icon">📝</span> VIEW ALL NOTES
           </button>
         </div>
       </div>
@@ -789,6 +780,27 @@
             <span class="empty-icon">📋</span>
             <span class="empty-text">NO WEIGHT LOG YET</span>
             <span class="empty-sub">Start tracking to see your history</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTES LOG MODAL -->
+  <div class="notes-log-modal" id="notesLogModal">
+    <div class="modal-overlay" onclick="closeNotesLogModal()"></div>
+    <div class="modal-content notes-log-modal-content">
+      <div class="modal-header">
+        <span class="modal-title">📝 WEEKLY NOTES</span>
+        <button class="modal-close" onclick="closeNotesLogModal()">✕</button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="notes-log-list" id="notesLogList">
+          <div class="log-empty">
+            <span class="empty-icon">📝</span>
+            <span class="empty-text">NO NOTES YET</span>
+            <span class="empty-sub">Start journaling your progress</span>
           </div>
         </div>
       </div>

@@ -1872,6 +1872,22 @@ html, body {
   box-shadow: 0 0 15px var(--accent)22;
 }
 
+/* NOTES LOG CARD - Professional Summary */
+.notes-log-card {
+  margin: 1rem 1rem;
+  background: linear-gradient(135deg, var(--surface) 0%, var(--surface)77);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.notes-log-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 15px var(--accent)22;
+}
+
 .card-header {
   padding: 1rem;
   background: linear-gradient(135deg, var(--accent)11, var(--accent)05);
@@ -2182,21 +2198,82 @@ html, body {
   opacity: 0.8;
 }
 
-/* Responsive */
-@media (max-width: 480px) {
-  .weight-stats {
-    grid-template-columns: 1fr;
-  }
+/* NOTES LOG ENTRY */
+.notes-log-entry {
+  background: linear-gradient(135deg, var(--surface) 0%, var(--surface)77);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  padding: 0.8rem;
+  margin-bottom: 0.6rem;
+  transition: all 0.2s ease;
+}
 
-  .weight-input-row {
-    flex-direction: column;
-  }
+.notes-log-entry:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 12px var(--accent)11;
+}
 
-  .weight-input-field {
-    width: 100%;
-  }
+.notes-log-entry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.6rem;
+}
 
-  .btn-log-weight {
-    width: 100%;
-  }
+.notes-log-date {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  letter-spacing: 0.05em;
+}
+
+.notes-log-date-icon {
+  font-size: 0.9rem;
+}
+
+.notes-log-delete {
+  padding: 0.3rem 0.6rem;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.notes-log-delete:hover {
+  color: #ef4444;
+  transform: scale(1.2);
+}
+
+.notes-log-content {
+  margin-bottom: 0.6rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.notes-log-content:last-child {
+  margin-bottom: 0;
+  border-bottom: none;
+}
+
+.notes-label {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 0.3rem;
+}
+
+.notes-text {
+  font-size: 0.85rem;
+  color: var(--text);
+  line-height: 1.4;
+  word-break: break-word;
+  white-space: pre-wrap;
 }

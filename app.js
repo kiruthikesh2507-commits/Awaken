@@ -176,6 +176,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   initProgressTrackers();
   updateWeightDisplay();
   updateWeeklyNotesDisplay();
+  updateNotesCard(PROGRESS_DATA.entries.filter(e => e.type === 'weekly_note'));
 });
 
 function registerSW() {
@@ -1732,6 +1733,7 @@ async function saveWeeklyNote() {
   document.getElementById('noteCharCount').textContent = '0';
   document.getElementById('goalsCharCount').textContent = '0';
   updateWeeklyNotesDisplay();
+  updateNotesCard(PROGRESS_DATA.entries.filter(e => e.type === 'weekly_note'));
   showNotification('✓ Weekly note saved!', 'success');
   if (typeof playSound === 'function') playSound('success');
 }
@@ -1816,6 +1818,8 @@ function deleteWeeklyNote(entryId) {
   PROGRESS_DATA.entries = PROGRESS_DATA.entries.filter(e => e.id !== entryId);
   StorageManager.saveProgress({ id: entryId, deleted: true });
   updateWeeklyNotesDisplay();
+  updateNotesLogHistory();
+  updateNotesCard(PROGRESS_DATA.entries.filter(e => e.type === 'weekly_note'));
   showNotification('✓ Note deleted', 'success');
 }
 
@@ -1861,10 +1865,79 @@ function openWeightLogModal() {
   }
 }
 
-function closeWeightLogModal() {
-  const modal = document.getElementById('weightLogModal');
+// Open Notes Log Modal
+function openNotesLogModal() {
+  const modal = document.getElementById('notesLogModal');
+  if (modal) {
+    modal.classList.add('active');
+    updateNotesLogHistory();
+  }
+}
+
+// Close Notes Log Modal
+function closeNotesLogModal() {
+  const modal = document.getElementById('notesLogModal');
   if (modal) {
     modal.classList.remove('active');
+  }
+}
+
+// Update Notes Log History in Modal
+function updateNotesLogHistory() {
+  const noteEntries = PROGRESS_DATA.entries.filter(e => e.type === 'weekly_note');
+  const container = document.getElementById('notesLogList');
+
+  if (!container) return;
+
+  if (noteEntries.length === 0) {
+    container.innerHTML = `<div class="log-empty"><span class="empty-icon">📝</span><span class="empty-text">NO NOTES YET</span><span class="empty-sub">Start journaling your progress</span></div>`;
+    updateNotesCard(noteEntries);
+    return;
+  }
+
+  noteEntries.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  const formatDate = (dateStr) => {
+    const date = new Date(dateStr);
+    const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+    const dayName = days[date.getDay()];
+    return `${dayName} ${dateStr}`;
+  };
+
+  const notesHtml = noteEntries.map((entry) => `
+    <div class="notes-log-entry">
+      <div class="notes-log-entry-header">
+        <div class="notes-log-date">
+          <span class="notes-log-date-icon">📅</span>
+          <span>${formatDate(entry.date)} - Week ${entry.week}</span>
+        </div>
+        <button class="notes-log-delete" onclick="deleteWeeklyNote('${entry.id}')">✕</button>
+      </div>
+      ${entry.note ? `
+        <div class="notes-log-content">
+          <div class="notes-label">FEELING</div>
+          <div class="notes-text">${entry.note}</div>
+        </div>
+      ` : ''}
+      ${entry.goals ? `
+        <div class="notes-log-content">
+          <div class="notes-label">GOALS</div>
+          <div class="notes-text">${entry.goals}</div>
+        </div>
+      ` : ''}
+    </div>
+  `).join('');
+
+  container.innerHTML = notesHtml;
+  updateNotesCard(noteEntries);
+}
+
+// Update Notes Card Stats
+function updateNotesCard(noteEntries) {
+  const notesEl = document.getElementById('cardTotalNotes');
+  if (notesEl) {
+    const count = noteEntries && noteEntries.length > 0 ? noteEntries.length : 0;
+    notesEl.textContent = count;
   }
 }
 
