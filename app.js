@@ -158,6 +158,7 @@ let STATE = {
   questCount: 8,
   activeFilter: 'all',
   activeTab: 'dashboard',
+  workoutLog: {},   // { questName: [{date, weight, reps, sets, note}] }
 };
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
@@ -1197,7 +1198,7 @@ function questCard(q) {
         <span class="quest-type-badge ${q.type}">${q.type.toUpperCase()}</span>
         ${rewardsOrStatus}
       </div>
-      <div class="quest-name">${q.name}</div>
+      <div class="quest-name">${q.name}${q.compound ? '<span class="compound-badge">COMPOUND — DO FIRST</span>' : ''}</div>
       <div class="quest-desc">${q.description}</div>
       <div class="quest-stat-tag">
         <div class="stat-dot" style="background:${statColor}"></div>
@@ -1207,7 +1208,11 @@ function questCard(q) {
         <button class="btn-complete" onclick="completeQuest('${q.id}')" ${q.completed ? 'disabled' : ''}>
           ${q.completed ? (q.skipped ? '— SKIPPED' : '✓ COMPLETE') : 'MARK COMPLETE'}
         </button>
+        ${q.muscle && q.muscle !== 'lifestyle' && q.muscle !== 'warmup' && q.muscle !== 'cooldown'
+          ? `<button class="btn-log-workout" onclick="openWorkoutLog('${q.id}','${q.name.replace(/'/g, String.fromCharCode(92,39))}')" title="Log weight/reps for progression tracking">⚖ LOG</button>`
+          : ''}
       </div>
+      ${q.muscle && q.muscle !== 'lifestyle' && q.muscle !== 'warmup' && q.muscle !== 'cooldown' ? buildProgressionIndicator(q.name) : ''}
     </div>`;
 }
 
@@ -1314,6 +1319,15 @@ function syncUI() {
     ).join('');
   } else {
     chestArea.style.display = 'none';
+  }
+
+  // Show deload week warning
+  const startDateForDeload = STATE.hunter && STATE.hunter.startDate ? new Date(STATE.hunter.startDate) : new Date();
+  const weeksSince = Math.floor((Date.now() - startDateForDeload.getTime()) / (1000*60*60*24*7));
+  const isDeload = weeksSince > 0 && weeksSince % 5 === 0;
+  const deloadBanner = document.getElementById('deloadBanner');
+  if (deloadBanner) {
+    deloadBanner.style.display = isDeload ? 'block' : 'none';
   }
 
   const today = getTodayStr();
@@ -2034,3 +2048,118 @@ function startAutoSave() {
   
   console.log('✓ Auto-save started');
 }
+
+// ─── PROGRESSIVE OVERLOAD TRACKER ────────────────────────────────────────────
+
+function buildProgressionIndicator(questName) {
+  if (!STATE.workoutLog) STATE.workoutLog = {};
+  const history = STATE.workoutLog[questName];
+  if (!history || history.length === 0) return '';
+  const last = history[history.length - 1];
+  const prev = history.length > 1 ? history[history.length - 2] : null;
+  let trend = '';
+  if (prev && last.weight && prev.weight) {
+    const diff = parseFloat(last.weight) - parseFloat(prev.weight);
+    if (diff > 0) trend = `<span style="color:#22c55e">▲ +${diff}kg</span>`;
+    else if (diff < 0) trend = `<span style="color:#ef4444">▼ ${diff}kg</span>`;
+    else trend = `<span style="color:#888">→ same</span>`;
+  }
+  return `<div class="progression-indicator">
+    <span class="prog-label">LAST: </span>
+    ${last.weight ? `<span class="prog-val">${last.weight}kg</span>` : ''}
+    ${last.sets ? `<span class="prog-val">${last.sets}×${last.reps}</span>` : ''}
+    ${trend}
+    <span class="prog-date">${last.date}</span>
+  </div>`;
+}
+
+window.openWorkoutLog = function(questId, questName) {
+  if (!STATE.workoutLog) STATE.workoutLog = {};
+  const history = STATE.workoutLog[questName] || [];
+  const last = history.length > 0 ? history[history.length - 1] : null;
+
+  // Build history table
+  const histRows = history.slice(-5).reverse().map(h => `
+    <tr>
+      <td>${h.date}</td>
+      <td>${h.weight ? h.weight + 'kg' : '—'}</td>
+      <td>${h.sets ? h.sets + '×' + h.reps : '—'}</td>
+      <td style="color:#888;font-size:11px">${h.note || ''}</td>
+    </tr>`).join('');
+
+  const suggestedWeight = last && last.weight ? (parseFloat(last.weight) + 2.5).toFixed(1) : '';
+
+  let overlay = document.getElementById('workoutLogOverlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'workoutLogOverlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
+    document.body.appendChild(overlay);
+  }
+
+  overlay.innerHTML = `
+    <div style="background:var(--card);border:1px solid var(--accent);border-radius:8px;padding:20px;max-width:420px;width:100%;max-height:90vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div style="font-family:Rajdhani,sans-serif;font-size:13px;color:var(--accent);font-weight:700">⚖ LOG WORKOUT</div>
+        <button onclick="document.getElementById('workoutLogOverlay').style.display='none'" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer">✕</button>
+      </div>
+      <div style="font-size:13px;font-weight:600;margin-bottom:12px;color:var(--text)">${questName}</div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+        <div>
+          <label style="font-size:10px;color:var(--text-muted);display:block;margin-bottom:4px">WEIGHT (kg)</label>
+          <input id="wl-weight" type="number" step="0.5" placeholder="${suggestedWeight || '0'}" value="${suggestedWeight}"
+            style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px;border-radius:4px;font-size:13px">
+        </div>
+        <div>
+          <label style="font-size:10px;color:var(--text-muted);display:block;margin-bottom:4px">SETS</label>
+          <input id="wl-sets" type="number" placeholder="${last ? last.sets : '3'}" value="${last ? last.sets : '3'}"
+            style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px;border-radius:4px;font-size:13px">
+        </div>
+        <div>
+          <label style="font-size:10px;color:var(--text-muted);display:block;margin-bottom:4px">REPS</label>
+          <input id="wl-reps" type="number" placeholder="${last ? last.reps : '10'}" value="${last ? last.reps : '10'}"
+            style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px;border-radius:4px;font-size:13px">
+        </div>
+      </div>
+      <div style="margin-bottom:12px">
+        <label style="font-size:10px;color:var(--text-muted);display:block;margin-bottom:4px">NOTE (optional)</label>
+        <input id="wl-note" type="text" placeholder="How did it feel? Easy? Hard?" maxlength="80"
+          style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px;border-radius:4px;font-size:12px">
+      </div>
+      ${last ? `<div style="font-size:11px;color:var(--accent);margin-bottom:10px">💡 Last session: ${last.weight ? last.weight+'kg' : '—'} × ${last.sets}×${last.reps} — Try to beat it!</div>` : '<div style="font-size:11px;color:var(--text-muted);margin-bottom:10px">First time logging this exercise. Start tracking to see progression!</div>'}
+      <button onclick="saveWorkoutLog('${questName.replace(/'/g,"\\'")}')"
+        style="width:100%;background:var(--accent);color:#fff;border:none;padding:10px;border-radius:4px;font-family:Rajdhani,sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:12px">
+        SAVE LOG ENTRY
+      </button>
+      ${histRows ? `
+        <div style="font-size:10px;color:var(--text-muted);margin-bottom:6px;font-family:Rajdhani,sans-serif">RECENT HISTORY</div>
+        <table style="width:100%;font-size:11px;border-collapse:collapse">
+          <tr style="color:var(--text-muted)"><td>DATE</td><td>WEIGHT</td><td>SETS×REPS</td><td>NOTE</td></tr>
+          ${histRows}
+        </table>` : ''}
+    </div>`;
+  overlay.style.display = 'flex';
+};
+
+window.saveWorkoutLog = function(questName) {
+  if (!STATE.workoutLog) STATE.workoutLog = {};
+  const weight = document.getElementById('wl-weight').value;
+  const sets = document.getElementById('wl-sets').value;
+  const reps = document.getElementById('wl-reps').value;
+  const note = document.getElementById('wl-note').value;
+  if (!weight && !sets) { showToast('ENTER AT LEAST WEIGHT OR SETS', 'error'); return; }
+  if (!STATE.workoutLog[questName]) STATE.workoutLog[questName] = [];
+  STATE.workoutLog[questName].push({
+    date: getTodayStr(),
+    weight: weight ? parseFloat(weight) : null,
+    sets: sets ? parseInt(sets) : null,
+    reps: reps ? parseInt(reps) : null,
+    note: note || '',
+  });
+  saveState();
+  document.getElementById('workoutLogOverlay').style.display = 'none';
+  renderQuests();
+  showToast('WORKOUT LOGGED ✓', 'success');
+};
+
