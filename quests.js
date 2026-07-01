@@ -1417,74 +1417,94 @@ function getMusclesForToday(hunter) {
 
 // ─── MAIN DAILY QUEST GENERATOR ──────────────────────────────────────────────
 
+// Convert a structured ProgramEngine exercise (or warmup/cooldown block) into
+// the quest-card shape the rest of the app already knows how to render.
+function _exerciseToQuestCard(item, idx, ts, kind) {
+  if (kind === 'warmup' || kind === 'cooldown') {
+    return {
+      id: item.id || `${kind}_${ts}_${idx}`,
+      type: kind,
+      name: item.name,
+      description: item.desc,
+      stat: 'Discipline',
+      rp: kind === 'warmup' ? 10 : 8,
+      statGain: 1,
+      completed: false,
+      isStructural: true, // warmup/cooldown can't be skipped via reroll
+    };
+  }
+  const p = item.prescription || {};
+  let amountText;
+  if (p.weight) {
+    amountText = `${p.sets} sets x ${p.reps} reps @ ${p.weight}kg`;
+  } else if (item.repRange && item.repRange[0] === item.repRange[1] && item.repRange[0] === 1) {
+    amountText = `${p.sets} sets x ${p.reps}s hold`; // time-based exercises use reps slot as seconds
+  } else {
+    amountText = `${p.sets} sets x ${p.reps} reps`;
+  }
+  return {
+    id: item.id || `ex_${ts}_${idx}`,
+    type: 'exercise',
+    name: `${item.name}${p.isDeload ? ' (Deload)' : ''}`,
+    description: `${amountText} — ${item.muscleLabel}.${p.note ? ' ' + p.note : ''}`,
+    stat: item.stat,
+    rp: item.baseRP,
+    statGain: item.baseStatGain,
+    completed: false,
+    exerciseName: item.name,
+    slotMuscle: item.slotMuscle,
+    loadable: item.loadable,
+    prescription: p,
+    role: item.role,
+  };
+}
+
 function generateQuestsLocally(hunter, rankName) {
   const usedNames = getUsedQuestsThisWeek();
   const fitnessLevel = hunter.fitness || 'intermediate';
   const workoutEnv = hunter.workoutEnv || 'home';
   const goals = hunter.goals || [];
-  const todayMuscles = getMusclesForToday(hunter);
-  const isRestDay = todayMuscles === null;
 
-  // Get quest count from state, default to 8
+  // Get quest count from state, default to 8 (used as a soft target for lifestyle quests only now —
+  // the workout itself is fully structured and not capped to an arbitrary count)
   const questCount = (typeof STATE !== 'undefined' && STATE.questCount) ? STATE.questCount : 8;
+  const ts = Date.now();
 
-  const quests = [];
+  // Build today's structured workout via the program engine (handles split,
+  // progressive overload, safe ordering, volume control, warmup/cooldown).
+  const structured = (typeof window !== 'undefined' && window.ProgramEngine)
+    ? window.ProgramEngine.buildStructuredWorkout(hunter)
+    : null;
+  const isRestDay = !structured;
+
+  const dailyQuests = [];
 
   if (isRestDay) {
-    // Rest day: 3 light fitness + 5 lifestyle + 1 special + 2 bonus
-    const lightQuests = pickQuestsForMuscle('core', fitnessLevel, rankName, workoutEnv, 1, usedNames);
+    // Rest day: light mobility/recovery + lifestyle quests, no heavy lifting quests
     const stretchQuests = pickLifestyleQuests(['mental_health','discipline'], fitnessLevel, rankName, 2, usedNames);
-    const lifestyleQuests = pickLifestyleQuests(goals, fitnessLevel, rankName, 5, [...usedNames, ...lightQuests.map(q=>q.name), ...stretchQuests.map(q=>q.name)]);
-    quests.push(...lightQuests, ...stretchQuests, ...lifestyleQuests);
-  } else {
-    // Workout day: allocate questCount between fitness and lifestyle
-    const lifestyleCount = Math.max(1, Math.floor(questCount / 3));
-    const fitnessTarget = questCount - lifestyleCount;
-    const muscleCount = todayMuscles.length;
-    const fitnessQuestsPerMuscle = Math.max(1, Math.floor(fitnessTarget / muscleCount));
-
-    todayMuscles.forEach(muscle => {
-      const mQuests = pickQuestsForMuscle(muscle, fitnessLevel, rankName, workoutEnv, fitnessQuestsPerMuscle, usedNames);
-      quests.push(...mQuests);
-      mQuests.forEach(q => usedNames.push(q.name));
+    const lifestyleQuests = pickLifestyleQuests(goals, fitnessLevel, rankName, 6, [...usedNames, ...stretchQuests.map(q=>q.name)]);
+    [...stretchQuests, ...lifestyleQuests].forEach((q, i) => {
+      dailyQuests.push({ ...q, id: `d${i}_${ts + i}`, type: 'daily' });
     });
+  } else {
+    // Workout day: warmup -> ordered exercises -> cooldown, all structured & progressive
+    dailyQuests.push(_exerciseToQuestCard(structured.warmup, 0, ts, 'warmup'));
+    structured.exercises.forEach((ex, i) => {
+      dailyQuests.push(_exerciseToQuestCard(ex, i, ts, 'exercise'));
+    });
+    dailyQuests.push(_exerciseToQuestCard(structured.cooldown, 0, ts, 'cooldown'));
 
-    // Fill to target fitness quests if needed
-    while (quests.length < fitnessTarget) {
-      const extra = pickQuestsForMuscle(todayMuscles[quests.length % todayMuscles.length] || todayMuscles[0], fitnessLevel, rankName, workoutEnv, 1, usedNames.concat(quests.map(q=>q.name)));
-      if (!extra.length) break;
-      quests.push(...extra);
-    }
-
-    // Add lifestyle quests
-    const lifeQuests = pickLifestyleQuests(goals, fitnessLevel, rankName, lifestyleCount, usedNames.concat(quests.map(q=>q.name)));
-    quests.push(...lifeQuests);
+    // A modest number of lifestyle quests alongside the workout (non-fitness goals
+    // like study/diet/mental health) — these remain randomized since there's no
+    // safety/progression concern for them.
+    const lifestyleCount = Math.max(2, Math.floor(questCount / 3));
+    const lifeQuests = pickLifestyleQuests(goals, fitnessLevel, rankName, lifestyleCount, usedNames.concat(dailyQuests.map(q=>q.name)));
+    lifeQuests.forEach((q, i) => {
+      dailyQuests.push({ ...q, id: `life${i}_${ts + 500 + i}`, type: 'daily' });
+    });
   }
 
-  // Cap to questCount daily quests
-  const ts = Date.now();
-  const dailyQuests = quests.slice(0, questCount).map((q, i) => ({...q, id: `d${i}_${ts + i}`, type: 'daily'}));
-
-  // Primary muscle for today's special/challenge quests
-  const primaryMuscle = (todayMuscles && todayMuscles[0]) || 'fullbody';
-
-  // 1 special quest (harder) — always from today's primary muscle
-  const specialPool = pickQuestsForMuscle(
-    primaryMuscle,
-    fitnessLevel, rankName, workoutEnv, 3,
-    usedNames.concat(dailyQuests.map(q=>q.name))
-  );
-  if (specialPool.length > 0) {
-    const special = {...specialPool[0]};
-    special.id = `s0_${ts + 100}`;
-    special.type = 'special';
-    special.rp = Math.round(special.rp * 2.5);
-    special.statGain = Math.max(3, special.statGain * 2);
-    special.name = 'SPECIAL: ' + special.name;
-    dailyQuests.push(special);
-  }
-
-  // 2 bonus quests — lifestyle only
+  // 2 bonus quests — lifestyle only, never touches the structured workout
   const bonusPool = pickLifestyleQuests(
     goals, fitnessLevel, rankName, 4,
     usedNames.concat(dailyQuests.map(q=>q.name))
@@ -1500,27 +1520,9 @@ function generateQuestsLocally(hunter, rankName) {
     });
   });
 
-  // Challenge quest every other day — from today's primary muscle
-  const dayNum = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
-  if (dayNum % 2 === 0) {
-    const challengePool = pickQuestsForMuscle(
-      primaryMuscle,
-      'advanced', rankName, workoutEnv, 1,
-      usedNames.concat(dailyQuests.map(q=>q.name))
-    );
-    if (challengePool.length > 0) {
-      const challenge = {...challengePool[0]};
-      challenge.id = `c0_${ts + 300}`;
-      challenge.type = 'challenging';
-      challenge.rp = Math.round(challenge.rp * 4);
-      challenge.statGain = Math.max(8, challenge.statGain * 4);
-      challenge.name = 'CHALLENGE: ' + challenge.name;
-      dailyQuests.push(challenge);
-    }
-  }
-
-  // Mark all used
-  markQuestsUsed(dailyQuests.map(q => q.name));
+  // Mark all used (lifestyle quest rotation only; structured exercises are
+  // intentionally NOT added here since they should recur for overload tracking)
+  markQuestsUsed(dailyQuests.filter(q => !q.exerciseName && !q.isStructural).map(q => q.name));
 
   return dailyQuests;
 }

@@ -513,12 +513,22 @@
         <div class="section-label">ACTIVE MISSIONS</div>
         <div class="quest-date" id="questDate"></div>
       </div>
+      <div class="workout-day-banner" id="workoutDayBanner" style="display:none">
+        <div class="wdb-left">
+          <span class="wdb-label" id="wdbDayLabel">PUSH DAY</span>
+          <span class="wdb-muscles" id="wdbMuscles"></span>
+        </div>
+        <div class="wdb-right">
+          <span class="wdb-meso" id="wdbMeso"></span>
+        </div>
+      </div>
       <div class="quest-filters">
         <button class="filter-btn active" onclick="filterQuests('all', event)">ALL</button>
         <button class="filter-btn" onclick="filterQuests('daily', event)">DAILY</button>
         <button class="filter-btn" onclick="filterQuests('special', event)">SPECIAL</button>
         <button class="filter-btn" onclick="filterQuests('bonus', event)">BONUS</button>
         <button class="filter-btn" onclick="filterQuests('challenging', event)">HARD</button>
+        <button class="filter-btn" onclick="filterQuests('exercise', event)">WORKOUT</button>
       </div>
       <div id="questList" class="quest-list">
         <div class="no-quests">
@@ -762,6 +772,7 @@
 </div>
 
 <!-- Load quest database FIRST, then app logic -->
+<script src="program-engine.js"></script>
 <script src="quests.js"></script>
 <script src="app.js"></script>
 <script src="features.js"></script>

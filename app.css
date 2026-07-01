@@ -733,6 +733,9 @@ html, body {
 .quest-type-bar.special { background: var(--purple); }
 .quest-type-bar.bonus { background: var(--gold); }
 .quest-type-bar.challenging { background: linear-gradient(90deg, var(--gold), var(--danger)); }
+.quest-type-bar.warmup { background: #f59e0b; }
+.quest-type-bar.cooldown { background: #38bdf8; }
+.quest-type-bar.exercise { background: var(--accent); }
 
 .quest-header-row {
   display: flex; justify-content: space-between; align-items: flex-start;
@@ -747,6 +750,12 @@ html, body {
 .quest-type-badge.special { color: var(--purple); border-color: var(--purple); background: rgba(168,85,247,0.1); }
 .quest-type-badge.bonus { color: var(--gold); border-color: var(--gold); background: rgba(251,191,36,0.1); }
 .quest-type-badge.challenging { color: var(--danger); border-color: var(--danger); background: var(--danger-dim); }
+.quest-type-badge.warmup { color: #f59e0b; border-color: #f59e0b; background: rgba(245,158,11,0.1); }
+.quest-type-badge.cooldown { color: #38bdf8; border-color: #38bdf8; background: rgba(56,189,248,0.1); }
+.quest-type-badge.exercise { color: var(--accent); border-color: var(--accent); background: var(--accent-glow); }
+
+.quest-card.structural { opacity: 0.92; }
+.quest-card.structural .quest-name { font-size: 0.95rem; }
 
 .quest-rewards-mini {
   display: flex; gap: 0.5rem;
@@ -2093,6 +2102,57 @@ html, body {
   gap: 0.6rem;
 }
 
+.exercise-log-target {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+.exercise-log-note {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
+.exercise-log-label {
+  display: block;
+  font-family: var(--font-main);
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin: 0.8rem 0 0.35rem;
+}
+.exercise-log-input {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.9rem;
+}
+.exercise-log-input:focus { outline: none; border-color: var(--accent); }
+.exercise-log-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.9rem;
+}
+.exercise-log-actions {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 1.2rem;
+}
+.exercise-log-cancel, .exercise-log-save { flex: 1; }
+
+
 .weight-log-entry {
   display: flex;
   justify-content: space-between;
@@ -2277,3 +2337,196 @@ html, body {
   word-break: break-word;
   white-space: pre-wrap;
 }
+
+/* ═══════════════════════════════════════════════════
+   PROGRAM ENGINE v3.0 — NEW UI ELEMENTS
+   ═══════════════════════════════════════════════════ */
+
+/* ── Workout Day Banner ──────────────────────────── */
+.workout-day-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, rgba(220,20,40,0.12) 0%, rgba(220,20,40,0.04) 100%);
+  border: 1px solid rgba(220,20,40,0.3);
+  border-radius: 10px;
+  padding: 0.7rem 1rem;
+  margin: 0.5rem 0 0.75rem 0;
+  gap: 0.5rem;
+}
+.wdb-left { display: flex; flex-direction: column; gap: 0.2rem; }
+.wdb-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+.wdb-muscles {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.wdb-right { text-align: right; }
+.wdb-meso {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 4px;
+  padding: 0.2rem 0.45rem;
+}
+
+/* ── Exercise Quest Cards (enhanced) ────────────────*/
+.quest-card.exercise-quest {
+  border-left: 3px solid var(--accent);
+}
+.quest-card.structural {
+  opacity: 0.9;
+  border-left: 3px solid #f59e0b;
+}
+.quest-card.structural.cooldown-card {
+  border-left-color: #38bdf8;
+}
+
+/* ── Prescription Pill ──────────────────────────── */
+.prescription-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: rgba(220,20,40,0.12);
+  border: 1px solid rgba(220,20,40,0.25);
+  border-radius: 6px;
+  padding: 0.25rem 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  margin-top: 0.35rem;
+  font-family: 'Courier New', monospace;
+}
+.prescription-pill.deload {
+  background: rgba(251,191,36,0.12);
+  border-color: rgba(251,191,36,0.35);
+  color: #fbbf24;
+}
+
+/* ── Progression Note ───────────────────────────── */
+.progression-note {
+  font-size: 0.68rem;
+  color: #22c55e;
+  margin-top: 0.3rem;
+  line-height: 1.4;
+  font-style: italic;
+  opacity: 0.9;
+}
+.progression-note.deload-note { color: #fbbf24; }
+
+/* ── Role Badge (compound / accessory / isolation) ─*/
+.role-badge {
+  display: inline-block;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: 3px;
+  padding: 0.1rem 0.35rem;
+  margin-left: 0.3rem;
+  vertical-align: middle;
+}
+.role-badge.compound   { background: rgba(220,20,40,0.2);   color: var(--accent);  border: 1px solid rgba(220,20,40,0.35); }
+.role-badge.accessory  { background: rgba(245,158,11,0.15); color: #f59e0b;        border: 1px solid rgba(245,158,11,0.3); }
+.role-badge.isolation  { background: rgba(99,102,241,0.15); color: #818cf8;        border: 1px solid rgba(99,102,241,0.3); }
+
+/* ── Muscle Coverage Mini-Chart (progress view) ───── */
+.muscle-coverage-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.35rem;
+  margin: 0.5rem 0;
+}
+.muscle-cov-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+.muscle-cov-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.muscle-cov-dot.trained  { background: #22c55e; }
+.muscle-cov-dot.today    { background: var(--accent); }
+.muscle-cov-dot.rest     { background: rgba(255,255,255,0.15); }
+
+/* ── Exercise Log Modal Enhancements ─────────────── */
+.weight-log-modal-content {
+  max-width: 420px;
+}
+.exercise-log-sets-row {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+.exercise-log-sets-row .exercise-log-input { flex: 1; }
+
+.exercise-log-deload-notice {
+  background: rgba(251,191,36,0.1);
+  border: 1px solid rgba(251,191,36,0.3);
+  border-radius: 8px;
+  padding: 0.5rem 0.7rem;
+  font-size: 0.72rem;
+  color: #fbbf24;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+/* ── Progress Tab — Exercise History ─────────────── */
+.ex-history-section {
+  margin: 1rem 0;
+}
+.ex-history-title {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+.ex-history-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  font-size: 0.72rem;
+}
+.ex-history-row:last-child { border-bottom: none; }
+.ex-history-date { color: var(--text-muted); }
+.ex-history-load { color: var(--text); font-weight: 600; }
+.ex-history-delta { color: #22c55e; font-size: 0.65rem; }
+.ex-history-delta.down { color: #fbbf24; }
+
+/* ── Rest Day Card ───────────────────────────────── */
+.rest-day-card {
+  text-align: center;
+  padding: 1.5rem 1rem;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  margin-bottom: 0.75rem;
+}
+.rest-day-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+.rest-day-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.06em;
+  margin-bottom: 0.25rem;
+}
+.rest-day-sub { font-size: 0.75rem; color: var(--text-muted); line-height: 1.4; }

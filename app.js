@@ -667,6 +667,7 @@ window.completeQuest = function(questId) {
   const quest = STATE.quests.find(q => q.id === questId);
   if (!quest || quest.completed) return;
   quest.completed = true;
+  recordNonLoadableExerciseIfNeeded(quest);
 
   let rpGain = quest.rp;
   let statGain = quest.statGain;
@@ -1163,13 +1164,47 @@ function renderQuests() {
   const list = document.getElementById('questList');
   const filter = STATE.activeFilter;
 
+  // Update the workout-day banner
+  const banner = document.getElementById('workoutDayBanner');
+  const wdbLabel = document.getElementById('wdbDayLabel');
+  const wdbMuscles = document.getElementById('wdbMuscles');
+  const wdbMeso = document.getElementById('wdbMeso');
+
   if (!STATE.quests.length) {
     list.innerHTML = `<div class="no-quests">
       <div class="no-quest-icon">◈</div>
       <div class="no-quest-text">NO MISSIONS ASSIGNED</div>
       <div class="no-quest-sub">Return to STATUS and generate today's quests</div>
     </div>`;
+    if (banner) banner.style.display = 'none';
     return;
+  }
+
+  // Determine if today is a workout day and show the banner
+  const hasExercise = STATE.quests.some(q => q.type === 'exercise' || q.type === 'warmup');
+  if (banner && hasExercise && STATE.hunter) {
+    banner.style.display = 'flex';
+    try {
+      if (window.ProgramEngine) {
+        const w = window.ProgramEngine.buildStructuredWorkout(STATE.hunter);
+        if (w) {
+          if (wdbLabel) wdbLabel.textContent = w.dayLabel.toUpperCase();
+          // Collect unique muscles from today's exercises
+          const muscles = [...new Set(
+            (w.exercises || []).map(e => window.ProgramEngine.MUSCLE_DISPLAY_NAMES[e.slotMuscle] || e.slotMuscle)
+          )];
+          if (wdbMuscles) wdbMuscles.textContent = muscles.join(' · ');
+          if (wdbMeso) {
+            const startDate = STATE.hunter.startDate ? new Date(STATE.hunter.startDate) : new Date();
+            const daysSince = Math.floor((Date.now() - startDate.getTime()) / (1000*60*60*24));
+            const weekInMeso = (Math.floor(daysSince / 7) % 4) + 1;
+            wdbMeso.textContent = `BLOCK ${w.mesoIndex + 1} · WK ${weekInMeso}/4`;
+          }
+        }
+      }
+    } catch(e) { /* banner update is non-critical */ }
+  } else if (banner) {
+    banner.style.display = 'none';
   }
 
   let filtered = filter === 'all' ? STATE.quests : STATE.quests.filter(q => q.type === filter);
@@ -1186,29 +1221,191 @@ function renderQuests() {
 
 function questCard(q) {
   const statColor = STAT_COLORS[q.stat] || 'var(--accent)';
-  const muscleTag = q.muscle && q.muscle !== 'lifestyle' ? `<span class="muscle-tag">${MUSCLE_LABELS[q.muscle] || q.muscle}</span>` : '';
+  const muscleNames = window.ProgramEngine?.MUSCLE_DISPLAY_NAMES || {};
+  const muscleTag = q.slotMuscle
+    ? `<span class="muscle-tag">${muscleNames[q.slotMuscle] || q.slotMuscle}</span>`
+    : (q.muscle && q.muscle !== 'lifestyle' ? `<span class="muscle-tag">${MUSCLE_LABELS[q.muscle] || q.muscle}</span>` : '');
+
   const rewardsOrStatus = q.completed
     ? `<span class="qr-complete-badge">${q.skipped ? '— SKIPPED' : '✓ DONE'}</span>`
     : `<div class="quest-rewards-mini"><span class="qr-rp">◆ ${q.rp} RP</span><span class="qr-stat">+${q.statGain} ${q.stat}</span></div>`;
+
+  // ── Role badge for exercise quests ──
+  const roleBadge = q.role
+    ? `<span class="role-badge ${q.role}">${q.role}</span>`
+    : '';
+
+  // ── Prescription pill — shows the actual progressive target ──
+  let prescriptionHTML = '';
+  if (q.type === 'exercise' && q.prescription) {
+    const p = q.prescription;
+    let pillText = '';
+    if (p.weight) {
+      pillText = `${p.sets} × ${p.reps} reps @ ${p.weight}kg`;
+    } else if (q.repRange && q.repRange[0] === 1 && q.repRange[1] === 1) {
+      pillText = `${p.sets} × ${p.reps}s hold`;
+    } else {
+      pillText = `${p.sets} × ${p.reps} reps`;
+    }
+    const pillClass = p.isDeload ? 'prescription-pill deload' : 'prescription-pill';
+    prescriptionHTML = `<div class="${pillClass}">${p.isDeload ? '⟳ DELOAD — ' : '⚔ '}${pillText}</div>`;
+    if (p.note) {
+      const noteClass = p.isDeload ? 'progression-note deload-note' : 'progression-note';
+      prescriptionHTML += `<div class="${noteClass}">${p.note}</div>`;
+    }
+  }
+
+  // ── Warmup/cooldown get a simpler layout ──
+  const isStructural = q.type === 'warmup' || q.type === 'cooldown';
+  const cardClass = [
+    'quest-card',
+    q.completed ? 'completed' : '',
+    q.type === 'challenging' ? 'challenging' : '',
+    q.type === 'special' ? 'special' : '',
+    isStructural ? 'structural' : '',
+    q.type === 'cooldown' ? 'cooldown-card' : '',
+    q.type === 'exercise' ? 'exercise-quest' : '',
+  ].filter(Boolean).join(' ');
+
+  const isLoadableExercise = q.type === 'exercise' && q.loadable;
+  const actionButton = q.completed
+    ? `<button class="btn-complete" disabled>${q.skipped ? '— SKIPPED' : '✓ COMPLETE'}</button>`
+    : isLoadableExercise
+      ? `<button class="btn-complete" onclick="openExerciseLogModal('${q.id}')">⚔ LOG & COMPLETE</button>`
+      : `<button class="btn-complete" onclick="completeQuest('${q.id}')">MARK COMPLETE</button>`;
+
   return `
-    <div class="quest-card ${q.completed ? 'completed' : ''} ${q.type === 'challenging' ? 'challenging' : ''} ${q.type === 'special' ? 'special' : ''}">
+    <div class="${cardClass}">
       <div class="quest-type-bar ${q.type}"></div>
       <div class="quest-header-row">
-        <span class="quest-type-badge ${q.type}">${q.type.toUpperCase()}</span>
+        <span class="quest-type-badge ${q.type}">${q.type.toUpperCase()}${roleBadge}</span>
         ${rewardsOrStatus}
       </div>
       <div class="quest-name">${q.name}</div>
       <div class="quest-desc">${q.description}</div>
+      ${prescriptionHTML}
       <div class="quest-stat-tag">
         <div class="stat-dot" style="background:${statColor}"></div>
         ${STAT_ICONS[q.stat] || ''} ${q.stat} ${muscleTag}
       </div>
       <div class="quest-actions">
-        <button class="btn-complete" onclick="completeQuest('${q.id}')" ${q.completed ? 'disabled' : ''}>
-          ${q.completed ? (q.skipped ? '— SKIPPED' : '✓ COMPLETE') : 'MARK COMPLETE'}
-        </button>
+        ${actionButton}
       </div>
     </div>`;
+}
+
+// ─── EXERCISE LOGGING MODAL (feeds the progressive overload engine) ──────────
+window.openExerciseLogModal = function(questId) {
+  const quest = STATE.quests.find(q => q.id === questId);
+  if (!quest || quest.completed) return;
+  const p = quest.prescription || {};
+  const suggested = (typeof p.weight === 'number') ? p.weight : '';
+  const topReps = (quest.repRange && quest.repRange[1]) || p.reps || 8;
+  const exName = (quest.exerciseName || quest.name).toUpperCase();
+
+  // Retrieve previous session data for context
+  let prevHTML = '';
+  if (window.ProgramEngine && quest.exerciseName) {
+    const store = window.ProgramEngine.getExerciseProgressStore();
+    const prog = store[quest.exerciseName];
+    if (prog && prog.history && prog.history.length > 0) {
+      const recent = prog.history.slice(-3).reverse();
+      prevHTML = `<div class="ex-history-section">
+        <div class="ex-history-title">Recent sessions</div>
+        ${recent.map((h, i) => {
+          const prev = recent[i+1];
+          const delta = (prev && h.weight && prev.weight)
+            ? (h.weight - prev.weight >= 0 ? `+${(h.weight - prev.weight).toFixed(2)}kg` : `${(h.weight - prev.weight).toFixed(2)}kg`)
+            : '';
+          const deltaClass = delta.startsWith('-') ? 'ex-history-delta down' : 'ex-history-delta';
+          const dateStr = h.date ? new Date(h.date).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '—';
+          const loadStr = h.weight ? `${h.weight}kg × ${h.repsAchieved || '?'}` : `${h.repsAchieved || '?'} reps`;
+          return `<div class="ex-history-row">
+            <span class="ex-history-date">${dateStr}</span>
+            <span class="ex-history-load">${loadStr}</span>
+            ${delta ? `<span class="${deltaClass}">${delta}</span>` : ''}
+          </div>`;
+        }).join('')}
+      </div>`;
+    }
+  }
+
+  const deloadNotice = p.isDeload
+    ? `<div class="exercise-log-deload-notice">⟳ DELOAD WEEK — Use lighter weight intentionally. Your body needs this to keep growing.</div>`
+    : '';
+
+  let modal = document.getElementById('exerciseLogModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'exerciseLogModal';
+    modal.className = 'weight-log-modal exercise-log-modal';
+    document.body.appendChild(modal);
+  }
+  modal.innerHTML = `
+    <div class="modal-overlay" onclick="closeExerciseLogModal()"></div>
+    <div class="modal-content weight-log-modal-content">
+      <div class="modal-header">
+        <span class="modal-title">⚔ ${exName}</span>
+        <button class="modal-close" onclick="closeExerciseLogModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        ${deloadNotice}
+        <div class="exercise-log-target">
+          Target: <strong>${p.sets || '?'} sets × ${p.reps || '?'} reps${suggested ? ' @ <strong>' + suggested + 'kg</strong>' : ''}</strong>
+        </div>
+        ${p.note && !p.isDeload ? `<div class="exercise-log-note">${p.note}</div>` : ''}
+        ${prevHTML}
+        <label class="exercise-log-label">Weight used (kg)</label>
+        <input type="number" id="logWeightInput" class="exercise-log-input" value="${suggested}" step="2.5" min="0" placeholder="e.g. ${suggested || 40}">
+        <label class="exercise-log-label">Reps achieved (your hardest set)</label>
+        <input type="number" id="logRepsInput" class="exercise-log-input" value="${p.reps || ''}" min="1" placeholder="e.g. ${p.reps || 8}">
+        <label class="exercise-log-checkbox-row">
+          <input type="checkbox" id="logHitTopCheckbox">
+          I hit <strong>${topReps} reps</strong> on EVERY working set (unlocks weight increase)
+        </label>
+        <div class="exercise-log-actions">
+          <button class="btn-view-log exercise-log-cancel" onclick="closeExerciseLogModal()">Cancel</button>
+          <button class="btn-complete exercise-log-save" onclick="submitExerciseLog('${questId}')">Save &amp; Complete ⚔</button>
+        </div>
+      </div>
+    </div>`;
+  modal.classList.add('active');
+};
+
+window.closeExerciseLogModal = function() {
+  const modal = document.getElementById('exerciseLogModal');
+  if (modal) modal.classList.remove('active');
+};
+
+window.submitExerciseLog = function(questId) {
+  const quest = STATE.quests.find(q => q.id === questId);
+  if (!quest) return;
+  const weightInput = document.getElementById('logWeightInput');
+  const repsInput = document.getElementById('logRepsInput');
+  const hitTopInput = document.getElementById('logHitTopCheckbox');
+
+  const weight = weightInput ? parseFloat(weightInput.value) || 0 : 0;
+  const repsAchieved = repsInput ? parseInt(repsInput.value) || 0 : 0;
+  const allSetsHitTop = !!(hitTopInput && hitTopInput.checked);
+
+  if (window.ProgramEngine && quest.exerciseName) {
+    window.ProgramEngine.recordExerciseResult(quest.exerciseName, quest.slotMuscle, {
+      weight, repsAchieved, allSetsHitTop,
+    });
+  }
+  closeExerciseLogModal();
+  completeQuest(questId);
+};
+
+// Non-loadable exercises (bodyweight reps/holds) still feed the consistency-gated
+// progression engine, just without a weight prompt.
+function recordNonLoadableExerciseIfNeeded(quest) {
+  if (quest.type === 'exercise' && !quest.loadable && window.ProgramEngine && quest.exerciseName) {
+    window.ProgramEngine.recordExerciseResult(quest.exerciseName, quest.slotMuscle, {
+      completed: true,
+      repsAchieved: quest.prescription ? quest.prescription.reps : undefined,
+    });
+  }
 }
 
 window.filterQuests = function(f, e) {
