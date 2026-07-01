@@ -327,23 +327,6 @@ window.animRankUp = function(rankName) {
   `;
   document.body.appendChild(overlay);
 
-  // Resolve badge image for the new rank
-  const _ruShort = rankName.split('-')[0];
-  const _ruImgSrc = (typeof RANK_BADGES !== 'undefined' && RANK_BADGES[_ruShort]) || '';
-  const _ruBadgeHTML = _ruImgSrc
-    ? `<img src="${_ruImgSrc}" alt="${_ruShort}" style="
-        width:140px;height:140px;object-fit:contain;
-        filter:drop-shadow(0 0 30px rgba(220,20,40,0.95)) drop-shadow(0 0 60px rgba(220,20,40,0.5));
-        animation:rankupPop 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;
-      ">`
-    : `<div style="
-        width:120px;height:120px;margin:0 auto;
-        background:linear-gradient(135deg,#dc1428,#8b0010);
-        clip-path:polygon(50% 0%,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%);
-        display:flex;align-items:center;justify-content:center;
-        box-shadow:0 0 60px rgba(220,20,40,0.9);
-      "><span style="font-size:2.8rem;font-weight:900;color:#fff;">${_ruShort}</span></div>`;
-
   overlay.innerHTML = `
     <div id="ruFlash" style="
       position:absolute;top:0;left:0;width:100%;height:100%;
@@ -356,7 +339,15 @@ window.animRankUp = function(rankName) {
       transform:scale(0.1) rotate(-15deg);opacity:0;
       transition:transform 0.55s cubic-bezier(0.34,1.56,0.64,1), opacity 0.35s;
     ">
-      <div style="margin:0 auto 0.75rem;">${_ruBadgeHTML}</div>
+      <div style="
+        width:120px;height:120px;margin:0 auto;
+        background:linear-gradient(135deg,#dc1428,#8b0010);
+        clip-path:polygon(50% 0%,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%);
+        display:flex;align-items:center;justify-content:center;
+        box-shadow:0 0 60px rgba(220,20,40,0.9),0 0 120px rgba(220,20,40,0.4);
+      ">
+        <span style="font-size:2.8rem;font-weight:900;color:#fff;letter-spacing:-1px;">${rankName.split('-')[0]}</span>
+      </div>
       <div style="
         margin-top:1rem;font-size:1.4rem;font-weight:700;
         color:#dc1428;letter-spacing:0.25em;

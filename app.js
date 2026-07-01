@@ -890,19 +890,14 @@ function renderRankTable() {
   rt.innerHTML = RANKS.map(r => {
     const achieved = total >= r.max;
     const current  = total >= r.min && total < r.max;
-    let cls = ''; let statusBadge = '';
-    if (current)       { cls = 'current';  statusBadge = '<span class="rank-status-badge current">CURRENT</span>'; }
-    else if (achieved) { cls = 'achieved'; statusBadge = '<span class="rank-status-badge achieved">✓</span>'; }
-    else               { cls = 'locked';   statusBadge = '<span class="rank-status-badge locked">LOCKED</span>'; }
-    const imgSrc = (typeof RANK_BADGES !== 'undefined' && RANK_BADGES[r.short]) || '';
-    const badgeImg = imgSrc
-      ? `<img class="rank-row-badge" src="${imgSrc}" alt="${r.short}">`
-      : `<span class="rank-row-letter">${r.short}</span>`;
+    let cls = ''; let badge = '';
+    if (current)  { cls = 'current';  badge = '<span class="rank-status-badge current">CURRENT</span>'; }
+    else if (achieved) { cls = 'achieved'; badge = '<span class="rank-status-badge achieved">✓</span>'; }
+    else { badge = '<span class="rank-status-badge locked">LOCKED</span>'; }
     return `<div class="rank-row ${cls}">
-      ${badgeImg}
       <span class="rank-name">${r.name}</span>
       <span class="rank-req">${r.min}+ pts</span>
-      ${statusBadge}
+      ${badge}
     </div>`;
   }).join('');
 }
@@ -1475,22 +1470,10 @@ function syncUI() {
   const name  = STATE.hunter.name.toUpperCase();
 
   document.getElementById('headerName').textContent = name;
+  document.getElementById('headerRank').textContent = rank.short;
   document.getElementById('headerRankLabel').textContent = rank.name.toUpperCase();
   document.getElementById('headerRP').textContent = STATE.rp;
   document.getElementById('shopRP').textContent = STATE.rp;
-
-  // ── Rank badge images ──
-  const badgeSrc = (typeof RANK_BADGES !== 'undefined' && RANK_BADGES[rank.short]) || '';
-  const headerImg = document.getElementById('headerRankImg');
-  const dcImg = document.getElementById('dcRankImg');
-  if (headerImg) {
-    headerImg.src = badgeSrc;
-    headerImg.style.display = badgeSrc ? 'block' : 'none';
-  }
-  if (dcImg) {
-    dcImg.src = badgeSrc;
-    dcImg.style.display = badgeSrc ? 'block' : 'none';
-  }
 
   document.getElementById('dcRank').textContent = rank.name.toUpperCase();
   document.getElementById('dcName').textContent = name;
@@ -1498,18 +1481,13 @@ function syncUI() {
   document.getElementById('dcRP').textContent = STATE.rp;
   document.getElementById('dcStreak').textContent = STATE.streak;
 
-  // ── Rank progress bar with mini badges ──
-  const currentBadge = badgeSrc ? `<img class="rank-progress-mini-badge" src="${badgeSrc}" alt="${rank.short}">` : '';
+  document.getElementById('rpCurrentRank').textContent = rank.name.toUpperCase();
   if (next) {
-    const nextBadgeSrc = (typeof RANK_BADGES !== 'undefined' && RANK_BADGES[next.short]) || '';
-    const nextBadge = nextBadgeSrc ? `<img class="rank-progress-mini-badge" src="${nextBadgeSrc}" alt="${next.short}">` : '';
-    document.getElementById('rpCurrentRank').innerHTML = `<span class="rank-progress-label-with-badge">${currentBadge}${rank.name.toUpperCase()}</span>`;
-    document.getElementById('rpNextRank').innerHTML = `<span class="rank-progress-label-with-badge">${next.name.toUpperCase()}${nextBadge}</span>`;
+    document.getElementById('rpNextRank').textContent = next.name.toUpperCase();
     const pct = ((total - rank.min) / (next.min - rank.min)) * 100;
     document.getElementById('rankBarFill').style.width = Math.min(100, pct) + '%';
     document.getElementById('rankProgressText').textContent = `${total} / ${next.min} stat points`;
   } else {
-    document.getElementById('rpCurrentRank').innerHTML = `<span class="rank-progress-label-with-badge">${currentBadge}${rank.name.toUpperCase()}</span>`;
     document.getElementById('rpNextRank').textContent = 'MAX';
     document.getElementById('rankBarFill').style.width = '100%';
     document.getElementById('rankProgressText').textContent = `${total} — Z-RANK ACHIEVED`;
