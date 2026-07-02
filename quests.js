@@ -1204,15 +1204,15 @@ const LIFESTYLE_QUESTS = {
 };
 
 // ─── WEEKLY QUEST HISTORY (prevent same-week repeats) ────────────────────────
-function getWeekKey() {
+function getDayKey() {
   const now = new Date();
-  const startOfYear = new Date(now.getFullYear(), 0, 1);
-  const week = Math.floor((now - startOfYear) / (7 * 24 * 60 * 60 * 1000));
-  return `${now.getFullYear()}-W${week}`;
+  return `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}`;
 }
 
 function getUsedQuestsThisWeek() {
-  const key = 'usedQuests_' + getWeekKey();
+  // Changed: daily rotation so the lifestyle quest pool refreshes every day.
+  // Weekly rotation was exhausting the ~80 quest pool within 3 days.
+  const key = 'usedQuests_' + getDayKey();
   try {
     return JSON.parse(localStorage.getItem(key) || '[]');
   } catch {
@@ -1221,7 +1221,7 @@ function getUsedQuestsThisWeek() {
 }
 
 function markQuestsUsed(questNames) {
-  const key = 'usedQuests_' + getWeekKey();
+  const key = 'usedQuests_' + getDayKey();
   const existing = getUsedQuestsThisWeek();
   const updated = [...new Set([...existing, ...questNames])];
   localStorage.setItem(key, JSON.stringify(updated));
@@ -1260,16 +1260,18 @@ function pickQuestsForMuscle(muscle, fitnessLevel, rankName, workoutEnv, count, 
 
 function pickLifestyleQuests(goals, fitnessLevel, rankName, count, usedNames) {
   const allPools = [];
+  const g = Array.isArray(goals) ? goals : [];
 
-  // Determine which lifestyle categories are relevant
+  // If no goals set, treat all categories as equally weighted so quests always show.
+  const hasGoals = g.length > 0;
   const categoryWeights = {
-    discipline: goals.includes('discipline') ? 3 : 1,
-    mental: goals.includes('mental_health') ? 3 : 1,
-    social: goals.includes('be_social') ? 3 : 1,
-    appearance: goals.includes('appearance') ? 3 : 1,
-    study: goals.includes('study_more') ? 3 : 1,
-    finance: 2, // always included — finance knowledge is universal
-    fitness_cardio: (goals.includes('lose_weight') || goals.includes('build_muscle')) ? 2 : 1,
+    discipline:     (hasGoals ? (g.includes('discipline') ? 3 : 1) : 2),
+    mental:         (hasGoals ? (g.includes('mental_health') ? 3 : 1) : 2),
+    social:         (hasGoals ? (g.includes('be_social') ? 3 : 1) : 1),
+    appearance:     (hasGoals ? (g.includes('appearance') ? 3 : 1) : 1),
+    study:          (hasGoals ? (g.includes('study_more') ? 3 : 1) : 2),
+    finance:        2, // always included
+    fitness_cardio: (hasGoals ? ((g.includes('lose_weight') || g.includes('build_muscle')) ? 2 : 1) : 1),
   };
 
   Object.entries(categoryWeights).forEach(([cat, weight]) => {

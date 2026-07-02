@@ -223,7 +223,19 @@ function showApp() {
   renderStats();
   renderRankTable();
   syncThemeSwitch();
-  // Init rank tracker for rank-up detection
+  // Clear stale weekly usedQuests keys (migrating from weekly to daily rotation)
+try {
+  Object.keys(localStorage).forEach(k => {
+    if (k.startsWith('usedQuests_') && !k.includes('-' + new Date().getDate() + '')) {
+      // Only keep today's key
+      const today = new Date();
+      const todayKey = 'usedQuests_' + today.getFullYear() + '-' + (today.getMonth()+1) + '-' + today.getDate();
+      if (k !== todayKey) localStorage.removeItem(k);
+    }
+  });
+} catch(e) {}
+
+// Init rank tracker for rank-up detection
   if (typeof onRankChanged === 'function') _prevRankName = getCurrentRank().name;
   // Boot SFX + welcome animation
   if (typeof onAwakenAppReady === 'function' && STATE.hunter) {
@@ -1481,12 +1493,7 @@ function syncUI() {
 
   // ── Rank badge images ──
   const badgeSrc = (typeof RANK_BADGES !== 'undefined' && RANK_BADGES[rank.short]) || '';
-  const headerImg = document.getElementById('headerRankImg');
   const dcImg = document.getElementById('dcRankImg');
-  if (headerImg) {
-    headerImg.src = badgeSrc;
-    headerImg.style.display = badgeSrc ? 'block' : 'none';
-  }
   if (dcImg) {
     dcImg.src = badgeSrc;
     dcImg.style.display = badgeSrc ? 'block' : 'none';
