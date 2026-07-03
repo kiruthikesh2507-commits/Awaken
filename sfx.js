@@ -315,142 +315,293 @@ window.animQuestComplete = function(originEl) {
 // ─── RANK UP CINEMATIC ────────────────────────────────────────────────────────
 
 window.animRankUp = function(rankName) {
-  // Full-screen overlay
+  const old = document.getElementById('rankUpOverlay');
+  if (old) old.remove();
+
+  const _ruShort = rankName.replace('-Rank','').replace('-rank','');
+  const _ruImgSrc = (typeof RANK_BADGES !== 'undefined' && RANK_BADGES[_ruShort]) || '';
+
+  const PAL = {
+    'E':  {glow:'170,95,50',  a:'#b06030'}, 'D': {glow:'195,195,210',a:'#c8c8d8'},
+    'C':  {glow:'205,165,20', a:'#d4a818'}, 'B': {glow:'55,95,235',  a:'#4070ee'},
+    'A':  {glow:'165,45,235', a:'#b040f0'}, 'S': {glow:'210,210,228',a:'#dcdce8'},
+    'SS': {glow:'220,16,38',  a:'#dc1026'}, 'SSS':{glow:'185,0,22',  a:'#bb0016'},
+    'X':  {glow:'125,0,16',   a:'#7a0010'}, 'Z': {glow:'70,0,10',    a:'#3e0008'},
+  };
+  const LORE = {
+    'E':'The system has acknowledged your existence.',
+    'D':'Your potential has been recognized.',
+    'C':'You are no longer ordinary.',
+    'B':'Few reach this level. You are one of them.',
+    'A':'The gap between you and the weak grows vast.',
+    'S':'You stand where legends are born.',
+    'SS':'Power that bends reality itself.',
+    'SSS':'The system trembles at your presence.',
+    'X':'Beyond all known classifications.',
+    'Z':'You have transcended. There is nothing above.',
+  };
+  const pal = PAL[_ruShort] || PAL['S'];
+  const lore = LORE[_ruShort] || '';
+
+  if (!document.getElementById('rankup-styles')) {
+    const st = document.createElement('style');
+    st.id = 'rankup-styles';
+    st.textContent = `
+      @keyframes ru-badge-in {
+        0%  { transform:scale(.04) rotate(-20deg); opacity:0; filter:brightness(4) blur(6px); }
+        55% { transform:scale(1.2) rotate(6deg);  opacity:1; filter:brightness(2.5) blur(0); }
+        72% { transform:scale(.92) rotate(-3deg); filter:brightness(1.4); }
+        100%{ transform:scale(1) rotate(0); filter:brightness(1); }
+      }
+      @keyframes ru-badge-float {
+        0%,100%{ transform:translateY(0) scale(1) rotate(0deg); }
+        25%    { transform:translateY(-5px) scale(1.012) rotate(.5deg); }
+        75%    { transform:translateY(4px) scale(.989) rotate(-.5deg); }
+      }
+      @keyframes ru-text-in {
+        0%  { opacity:0; transform:translateY(18px) scaleX(.8) skewX(-4deg); }
+        100%{ opacity:1; transform:translateY(0) scaleX(1) skewX(0); }
+      }
+      @keyframes ru-label-in {
+        0%  { opacity:0; transform:scaleX(0); }
+        100%{ opacity:1; transform:scaleX(1); }
+      }
+      @keyframes ru-tap-pulse {
+        0%,100%{ opacity:.3; } 50%{ opacity:.65; }
+      }
+      @keyframes ru-scan-move {
+        0%  { transform:translateY(-100%); }
+        100%{ transform:translateY(100vh); }
+      }
+    `;
+    document.head.appendChild(st);
+  }
+
   const overlay = document.createElement('div');
   overlay.id = 'rankUpOverlay';
   overlay.style.cssText = `
-    position:fixed;top:0;left:0;width:100%;height:100%;
-    background:rgba(0,0,0,0);
+    position:fixed;inset:0;z-index:10000;
+    background:#000;overflow:hidden;
     display:flex;flex-direction:column;align-items:center;justify-content:center;
-    z-index:10000;pointer-events:all;
-    font-family:'Rajdhani',sans-serif;
+    font-family:'Rajdhani',sans-serif;cursor:pointer;
   `;
-  document.body.appendChild(overlay);
-
-  // Resolve badge image for the new rank
-  const _ruShort = rankName.split('-')[0];
-  const _ruImgSrc = (typeof RANK_BADGES !== 'undefined' && RANK_BADGES[_ruShort]) || '';
-  const _ruBadgeHTML = _ruImgSrc
-    ? `<img src="${_ruImgSrc}" alt="${_ruShort}" style="
-        width:140px;height:140px;object-fit:contain;
-        filter:drop-shadow(0 0 30px rgba(220,20,40,0.95)) drop-shadow(0 0 60px rgba(220,20,40,0.5));
-        animation:rankupPop 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;
-      ">`
-    : `<div style="
-        width:120px;height:120px;margin:0 auto;
-        background:linear-gradient(135deg,#dc1428,#8b0010);
-        clip-path:polygon(50% 0%,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%);
-        display:flex;align-items:center;justify-content:center;
-        box-shadow:0 0 60px rgba(220,20,40,0.9);
-      "><span style="font-size:2.8rem;font-weight:900;color:#fff;">${_ruShort}</span></div>`;
 
   overlay.innerHTML = `
-    <div id="ruFlash" style="
-      position:absolute;top:0;left:0;width:100%;height:100%;
-      background:radial-gradient(ellipse at center, rgba(220,20,40,0.55) 0%, rgba(0,0,0,0.92) 70%);
-      opacity:0;transition:opacity 0.25s;
-    "></div>
-    <div id="ruBadge" style="
-      position:relative;z-index:2;
-      text-align:center;
-      transform:scale(0.1) rotate(-15deg);opacity:0;
-      transition:transform 0.55s cubic-bezier(0.34,1.56,0.64,1), opacity 0.35s;
-    ">
-      <div style="margin:0 auto 0.75rem;">${_ruBadgeHTML}</div>
-      <div style="
-        margin-top:1rem;font-size:1.4rem;font-weight:700;
-        color:#dc1428;letter-spacing:0.25em;
-        text-shadow:0 0 20px rgba(220,20,40,0.8);
-      ">RANK UP</div>
-      <div style="
-        font-size:1.8rem;font-weight:900;color:#fff;
-        letter-spacing:0.15em;margin-top:0.3rem;
-        text-shadow:0 0 30px rgba(220,20,40,1);
-      ">${rankName.toUpperCase()}</div>
-      <div style="
-        margin-top:1.5rem;font-size:0.75rem;color:rgba(255,255,255,0.5);
-        letter-spacing:0.2em;
-      ">TAP TO CONTINUE</div>
+    <canvas id="ru-bg" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;"></canvas>
+    <canvas id="ru-fg" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:6;"></canvas>
+    <div style="position:absolute;inset:0;z-index:2;pointer-events:none;
+      background:repeating-linear-gradient(180deg,transparent 0,transparent 2px,rgba(0,0,0,.32) 2px,rgba(0,0,0,.32) 3px);"></div>
+    <div id="ru-flash" style="position:absolute;inset:0;z-index:10;background:#fff;opacity:0;pointer-events:none;"></div>
+    <div id="ru-red"   style="position:absolute;inset:0;z-index:9;background:#200003;opacity:0;pointer-events:none;transition:opacity .9s;"></div>
+    <div id="ru-sweeps" style="position:absolute;inset:0;z-index:3;overflow:hidden;pointer-events:none;"></div>
+    <div id="ru-glitch" style="position:absolute;inset:0;z-index:7;pointer-events:none;"></div>
+
+    <div style="position:relative;z-index:5;display:flex;flex-direction:column;align-items:center;text-align:center;padding:2rem;">
+
+      <div id="ru-eyerow" style="display:flex;align-items:center;gap:10px;margin-bottom:1.4rem;
+        opacity:0;transform:scaleX(0);transition:opacity .45s,transform .5s cubic-bezier(.16,1,.3,1);">
+        <div style="height:1px;width:55px;background:linear-gradient(to left,${pal.a},transparent);"></div>
+        <div style="font-family:'Orbitron',sans-serif;font-size:.62rem;font-weight:700;letter-spacing:.5em;
+          color:${pal.a};white-space:nowrap;">◆ ${rankName.toUpperCase()} ACHIEVED ◆</div>
+        <div style="height:1px;width:55px;background:linear-gradient(to right,${pal.a},transparent);"></div>
+      </div>
+
+      <div id="ru-badge" style="position:relative;width:160px;height:160px;
+        opacity:0;transform:scale(.04) rotate(-20deg);
+        transition:transform .7s cubic-bezier(.34,1.56,.64,1),opacity .2s,filter .45s;">
+        ${_ruImgSrc
+          ? `<img src="${_ruImgSrc}" style="width:160px;height:160px;object-fit:contain;display:block;position:relative;z-index:2;" alt="${rankName}">`
+          : `<div style="width:160px;height:160px;background:linear-gradient(135deg,${pal.a},#1a0003);
+              clip-path:polygon(50% 0%,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%);
+              display:flex;align-items:center;justify-content:center;">
+              <span style="font-family:'Orbitron',sans-serif;font-size:2.2rem;font-weight:900;color:#fff;">${_ruShort}</span>
+            </div>`}
+        <div style="position:absolute;inset:-22px;border-radius:50%;
+          background:radial-gradient(ellipse at center,rgba(${pal.glow},.2) 0%,transparent 70%);
+          box-shadow:0 0 50px 12px rgba(${pal.glow},.1);
+          opacity:0;transition:opacity .7s;" id="ru-aura"></div>
+      </div>
+
+      <div id="ru-rname" style="font-family:'Orbitron',sans-serif;font-size:clamp(1.7rem,5vw,2.4rem);
+        font-weight:900;color:#fff;letter-spacing:.2em;text-transform:uppercase;
+        margin-top:1.4rem;opacity:0;
+        transform:translateY(18px) scaleX(.8) skewX(-4deg);
+        transition:opacity .55s cubic-bezier(.16,1,.3,1),transform .55s cubic-bezier(.16,1,.3,1);">
+        ${rankName.toUpperCase()}
+      </div>
+
+      <div id="ru-div" style="display:flex;align-items:center;gap:8px;margin-top:.85rem;width:0;overflow:hidden;transition:width .6s ease;white-space:nowrap;">
+        <div style="height:1px;flex:1;background:linear-gradient(to right,transparent,${pal.a});"></div>
+        <div style="width:4px;height:4px;background:${pal.a};transform:rotate(45deg);flex-shrink:0;"></div>
+        <div style="height:1px;flex:1;background:linear-gradient(to left,transparent,${pal.a});"></div>
+      </div>
+
+      <div id="ru-lore" style="font-family:'Rajdhani',sans-serif;font-size:.65rem;
+        color:rgba(255,255,255,.2);letter-spacing:.16em;text-transform:uppercase;
+        max-width:270px;margin-top:.65rem;opacity:0;transition:opacity .7s;line-height:1.9;">
+        ${lore}
+      </div>
+
+      <div id="ru-tap" style="margin-top:2rem;opacity:0;transition:opacity .5s;
+        display:flex;align-items:center;gap:8px;font-size:.55rem;letter-spacing:.28em;
+        color:rgba(220,20,40,.35);animation:ru-tap-pulse 1.6s 2.4s ease-in-out infinite;">
+        <div style="height:1px;width:18px;background:rgba(220,20,40,.25);"></div>
+        TAP TO CONTINUE
+        <div style="height:1px;width:18px;background:rgba(220,20,40,.25);"></div>
+      </div>
     </div>
   `;
 
-  // Sweep lines (cinematic bars)
-  const bars = document.createElement('div');
-  bars.style.cssText = `
-    position:absolute;top:0;left:0;width:100%;height:100%;
-    pointer-events:none;overflow:hidden;z-index:1;
-  `;
-  for (let i = 0; i < 8; i++) {
-    const bar = document.createElement('div');
-    bar.style.cssText = `
-      position:absolute;height:2px;background:rgba(220,20,40,0.3);
-      left:-100%;width:100%;
-      top:${10 + i * 11}%;
-      transition:left ${0.4 + i * 0.06}s cubic-bezier(0.16,1,0.3,1);
-      transition-delay:${i * 0.04}s;
-    `;
-    bars.appendChild(bar);
-  }
-  overlay.appendChild(bars);
+  document.body.appendChild(overlay);
 
-  // Animate in
-  requestAnimationFrame(() => {
-    document.getElementById('ruFlash').style.opacity = '1';
-    setTimeout(() => {
-      document.getElementById('ruBadge').style.transform = 'scale(1) rotate(0deg)';
-      document.getElementById('ruBadge').style.opacity = '1';
-      bars.querySelectorAll('div').forEach(b => b.style.left = '0');
-    }, 80);
-  });
+  function oq(id){ return overlay.querySelector('#'+id); }
 
-  // Particle burst from badge
-  setTimeout(() => {
-    const canvas = getParticleCanvas();
-    const ctx    = canvas.getContext('2d');
-    const cx = canvas.width / 2, cy = canvas.height / 2;
-    const colors = ['#dc1428','#ff4444','#ffcc00','#ffffff','#ff8800'];
-    const particles = Array.from({ length: 100 }, () => ({
-      x: cx, y: cy - 40,
-      vx: (Math.random() - 0.5) * 18,
-      vy: (Math.random() - 0.5) * 18,
-      life: 1, decay: 0.012 + Math.random() * 0.015,
-      size: 4 + Math.random() * 8,
-      color: colors[Math.floor(Math.random() * colors.length)],
-    }));
-    function drawP() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      let alive = false;
-      for (const p of particles) {
-        if (p.life <= 0) continue; alive = true;
-        p.x += p.vx; p.y += p.vy; p.vy += 0.25; p.life -= p.decay;
-        ctx.save();
-        ctx.globalAlpha = Math.max(0, p.life);
-        ctx.fillStyle = p.color;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size / 2, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      }
-      if (alive) requestAnimationFrame(drawP);
-      else ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
-    requestAnimationFrame(drawP);
-  }, 300);
+  // ── SEQUENCE ──
+  // t0 flash
+  const fl = oq('ru-flash');
+  fl.style.opacity = '1';
+  setTimeout(()=>{ fl.style.transition='opacity .5s'; fl.style.opacity='0'; }, 40);
+
+  // t80 red pulse
+  setTimeout(()=>{
+    const rf = oq('ru-red'); rf.style.opacity='.55';
+    setTimeout(()=>{ rf.style.opacity='0'; },80);
+  },80);
+
+  // t120 tendrils
+  setTimeout(()=>{ _ruAura(oq('ru-bg'), pal); },120);
+
+  // t200 glitch
+  setTimeout(()=>{ _ruGlitch(oq('ru-glitch'), pal, 2); },200);
+  setTimeout(()=>{ _ruGlitch(oq('ru-glitch'), pal, 1); },290);
+
+  // t260 sweeps
+  setTimeout(()=>{
+    const sb = oq('ru-sweeps');
+    [{y:15,w:52,d:.06},{y:30,w:38,d:.12},{y:46,w:65,d:.05},{y:63,w:32,d:.09},{y:79,w:48,d:.03}]
+    .forEach(l=>{
+      const div=document.createElement('div');
+      div.style.cssText=`position:absolute;top:${l.y}%;left:0;height:1px;width:0;
+        background:linear-gradient(to right,transparent,rgba(${pal.glow},.55) 40%,rgba(${pal.glow},.2));
+        transition:width .38s ${l.d}s cubic-bezier(.16,1,.3,1);`;
+      sb.appendChild(div);
+      requestAnimationFrame(()=>setTimeout(()=>{ div.style.width=l.w+'%'; },16));
+    });
+  },260);
+
+  // t400 badge in
+  setTimeout(()=>{
+    const bw = oq('ru-badge');
+    bw.style.opacity='1';
+    bw.style.transform='scale(1.2) rotate(6deg)';
+    bw.style.filter=`brightness(2.5) drop-shadow(0 0 35px rgba(${pal.glow},1))`;
+    setTimeout(()=>{
+      bw.style.transform='scale(.92) rotate(-3deg)';
+      bw.style.filter=`brightness(1.4) drop-shadow(0 0 20px rgba(${pal.glow},.9))`;
+      setTimeout(()=>{
+        bw.style.transition='transform .2s ease,filter .3s';
+        bw.style.transform='scale(1) rotate(0)';
+        bw.style.filter=`brightness(1) drop-shadow(0 0 14px rgba(${pal.glow},.7))`;
+        const aura = oq('ru-aura'); if(aura) aura.style.opacity='1';
+        _ruGlitch(oq('ru-glitch'), pal, 3);
+        _ruRings(oq('ru-fg'), pal);
+        // Float loop
+        let ft=0;
+        function floatTick(){
+          ft+=.016;
+          const y=Math.sin(ft)*4.5, s=1+Math.sin(ft*.65)*.013, r=Math.sin(ft*.38)*.55;
+          const gw=9+Math.sin(ft)*5;
+          bw.style.transform=`translateY(${y}px) scale(${s}) rotate(${r}deg)`;
+          bw.style.filter=`brightness(1) drop-shadow(0 0 ${gw}px rgba(${pal.glow},.72))`;
+          if(overlay.parentNode) requestAnimationFrame(floatTick);
+        }
+        floatTick();
+      },160);
+    },300);
+  },400);
+
+  setTimeout(()=>{ const e=oq('ru-eyerow'); e.style.opacity='1'; e.style.transform='scaleX(1)'; },900);
+
+  setTimeout(()=>{
+    const r=oq('ru-rname');
+    r.style.opacity='1'; r.style.transform='translateY(0) scaleX(1) skewX(0)';
+    r.style.textShadow=`0 0 22px rgba(${pal.glow},.85),0 0 60px rgba(${pal.glow},.3)`;
+    setTimeout(()=>_ruGlitch(oq('ru-glitch'),pal,2),55);
+  },1150);
+
+  setTimeout(()=>{
+    oq('ru-div').style.width='230px';
+    setTimeout(()=>{ oq('ru-lore').style.opacity='1'; },200);
+    setTimeout(()=>{ oq('ru-tap').style.opacity='1'; },480);
+  },1600);
 
   // Dismiss
-  overlay.addEventListener('click', () => {
-    overlay.style.transition = 'opacity 0.4s';
-    overlay.style.opacity = '0';
-    setTimeout(() => overlay.remove(), 450);
-  });
-  setTimeout(() => {
-    if (overlay.parentNode) {
-      overlay.style.transition = 'opacity 0.4s';
-      overlay.style.opacity = '0';
-      setTimeout(() => overlay.remove(), 450);
-    }
-  }, 4500);
+  function dismiss(){
+    overlay.style.transition='opacity .45s';
+    overlay.style.opacity='0';
+    setTimeout(()=>{ if(overlay.parentNode) overlay.remove(); },480);
+  }
+  overlay.addEventListener('click', dismiss);
+  setTimeout(dismiss, 6500);
 };
+
+function _ruAura(cv, pal){
+  if(!cv) return;
+  const W=cv.offsetWidth||window.innerWidth, H=cv.offsetHeight||window.innerHeight;
+  cv.width=W; cv.height=H;
+  const ctx=cv.getContext('2d');
+  const strands=Array.from({length:20},()=>({
+    x:W*.2+Math.random()*W*.6, y:H, pts:[],
+    spd:1.4+Math.random()*2.6, drift:(Math.random()-.5)*.55,
+    life:1, decay:.005+Math.random()*.007, lw:.35+Math.random()*.9,
+  }));
+  function tick(){
+    ctx.clearRect(0,0,W,H); let alive=false;
+    strands.forEach(s=>{
+      if(s.life<=0)return;
+      s.y-=s.spd; s.x+=s.drift+(Math.random()-.5)*.65;
+      s.pts.push({x:s.x,y:s.y}); if(s.pts.length>30)s.pts.shift();
+      s.life-=s.decay; if(s.pts.length<2)return; alive=true;
+      ctx.save(); ctx.globalAlpha=Math.max(0,s.life*.48);
+      ctx.strokeStyle=`rgba(${pal.glow},1)`; ctx.lineWidth=s.lw; ctx.lineCap='round';
+      ctx.beginPath(); ctx.moveTo(s.pts[0].x,s.pts[0].y);
+      for(let i=1;i<s.pts.length;i++)ctx.lineTo(s.pts[i].x,s.pts[i].y);
+      ctx.stroke(); ctx.restore();
+    });
+    if(alive&&cv.parentNode)requestAnimationFrame(tick); else ctx.clearRect(0,0,W,H);
+  }
+  requestAnimationFrame(tick);
+}
+
+function _ruRings(cv, pal){
+  if(!cv) return;
+  const W=cv.offsetWidth||window.innerWidth, H=cv.offsetHeight||window.innerHeight;
+  cv.width=W; cv.height=H;
+  const ctx=cv.getContext('2d'), cx=W/2, cy=H/2, MR=Math.hypot(cx,cy);
+  const rings=[{r:0,max:MR*1.6,a:.7,spd:14},{r:-18,max:MR*1.3,a:.45,spd:11},{r:-42,max:MR,a:.28,spd:8},{r:-68,max:MR*.72,a:.16,spd:6}];
+  function draw(){
+    ctx.clearRect(0,0,W,H); let alive=false;
+    rings.forEach(r=>{
+      if(r.r<0){r.r+=r.spd;return;}
+      r.r+=r.spd; const p=Math.min(1,r.r/r.max),a=r.a*(1-p); if(a<=0)return; alive=true;
+      ctx.beginPath(); ctx.arc(cx,cy,r.r,0,Math.PI*2);
+      ctx.strokeStyle=`rgba(${pal.glow},${a.toFixed(3)})`; ctx.lineWidth=Math.max(.3,1.6*(1-p)); ctx.stroke();
+    });
+    if(alive&&cv.parentNode)requestAnimationFrame(draw); else ctx.clearRect(0,0,W,H);
+  }
+  requestAnimationFrame(draw);
+}
+
+function _ruGlitch(el, pal, count){
+  if(!el)return;
+  for(let i=0;i<count;i++){
+    const s=document.createElement('div');
+    const top=5+Math.random()*85, h=1+Math.random()*5, dx=(Math.random()-.5)*24, op=.1+Math.random()*.18;
+    s.style.cssText=`position:absolute;left:0;right:0;top:${top}%;height:${h}px;background:rgba(${pal.glow},${op});transform:translateX(${dx}px);pointer-events:none;`;
+    el.appendChild(s); setTimeout(()=>s.remove(), 50+Math.random()*55);
+  }
+}
+
 
 // ─── BADGE UNLOCK FLIP ────────────────────────────────────────────────────────
 

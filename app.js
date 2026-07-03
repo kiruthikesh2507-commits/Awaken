@@ -8,6 +8,7 @@
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
 
 const RANKS = [
+  { name: 'Unranked',  short: 'E',   min: 0,    max: 54   }, // below E-Rank threshold
   { name: 'E-Rank',    short: 'E',   min: 55,   max: 119  },
   { name: 'D-Rank',    short: 'D',   min: 120,  max: 219  },
   { name: 'C-Rank',    short: 'C',   min: 220,  max: 399  },
@@ -906,10 +907,11 @@ function renderRankTable() {
     if (current)       { cls = 'current';  statusBadge = '<span class="rank-status-badge current">CURRENT</span>'; }
     else if (achieved) { cls = 'achieved'; statusBadge = '<span class="rank-status-badge achieved">✓</span>'; }
     else               { cls = 'locked';   statusBadge = '<span class="rank-status-badge locked">LOCKED</span>'; }
-    const imgSrc = (typeof RANK_BADGES !== 'undefined' && RANK_BADGES[r.short]) || '';
+    const isUnranked = r.name === 'Unranked';
+    const imgSrc = (!isUnranked && typeof RANK_BADGES !== 'undefined' && RANK_BADGES[r.short]) || '';
     const badgeImg = imgSrc
       ? `<img class="rank-row-badge" src="${imgSrc}" alt="${r.short}">`
-      : `<span class="rank-row-letter">${r.short}</span>`;
+      : `<span class="rank-row-letter">${isUnranked ? '?' : r.short}</span>`;
     return `<div class="rank-row ${cls}">
       ${badgeImg}
       <span class="rank-name">${r.name}</span>
@@ -1492,7 +1494,8 @@ function syncUI() {
   document.getElementById('shopRP').textContent = STATE.rp;
 
   // ── Rank badge images ──
-  const badgeSrc = (typeof RANK_BADGES !== 'undefined' && RANK_BADGES[rank.short]) || '';
+  // No badge for Unranked — user hasn't reached E-Rank yet
+  const badgeSrc = (rank.name !== 'Unranked' && typeof RANK_BADGES !== 'undefined' && RANK_BADGES[rank.short]) || '';
   const dcImg = document.getElementById('dcRankImg');
   if (dcImg) {
     dcImg.src = badgeSrc;
