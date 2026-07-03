@@ -1200,6 +1200,21 @@ const LIFESTYLE_QUESTS = {
     {name:'Track Workout',template:'Complete a structured track workout: warm-up + intervals + cool-down.',stat:'Speed',baseRP:40,baseStatGain:3,goals:['lose_weight']},
     {name:'Hill Sprints',template:'Perform {reps:8} hill sprint repeats.',stat:'Speed',baseRP:40,baseStatGain:3,goals:['lose_weight']},
     {name:'Long Walk',template:'Walk {reps:8} kilometers at a brisk pace.',stat:'Stamina',baseRP:25,baseStatGain:2,goals:['lose_weight']},
+    // ── Agility & Speed drills ──
+    {name:'Agility Ladder Drills',template:'Complete {sets} sets of agility ladder drills — high knees, lateral shuffle, in-out. {time:10m} total.',stat:'Agility',baseRP:32,baseStatGain:2,goals:['discipline']},
+    {name:'Box Jump Sets',template:'Perform {sets} sets of {reps:8} box jumps. Land softly, reset fully between reps.',stat:'Speed',baseRP:35,baseStatGain:3,goals:['discipline']},
+    {name:'Broad Jump Repeats',template:'Perform {reps:8} broad jumps with full reset. Max horizontal distance each rep.',stat:'Speed',baseRP:30,baseStatGain:2,goals:['discipline']},
+    {name:'Lateral Bound Drills',template:'Complete {sets} sets of {reps:10} lateral bounds each side. Focus on explosive push.',stat:'Agility',baseRP:30,baseStatGain:2,goals:['discipline']},
+    {name:'Reactive Sprint Drill',template:'Perform {reps:6} reactive sprints — partner or timer signals start. {time:10s} burst each.',stat:'Speed',baseRP:38,baseStatGain:3,goals:['discipline']},
+    {name:'Bear Crawl Complex',template:'Complete {sets} sets of {reps:20}m bear crawl. Keep hips level and core tight.',stat:'Agility',baseRP:28,baseStatGain:2,goals:['discipline']},
+    // ── Flexibility & Mobility quests ──
+    {name:'Full-Body Flexibility Session',template:'Complete a {time:25m} full-body stretch — hips, hamstrings, chest, shoulders, thoracic. Hold each 45s.',stat:'Agility',baseRP:22,baseStatGain:2,goals:['discipline']},
+    {name:'Hip Flexor & Quad Stretch Protocol',template:'Perform hip flexor couch stretch {time:90s} each side + quad stretch {time:60s} each side. Repeat x2.',stat:'Agility',baseRP:18,baseStatGain:1,goals:['discipline']},
+    {name:'Thoracic Mobility Circuit',template:'Cat-cow x15 + thread-the-needle {time:30s} each side + foam roll thoracic {time:2m}.',stat:'Durability',baseRP:18,baseStatGain:1,goals:['discipline']},
+    {name:'Jefferson Curl Progression',template:'Perform {sets} sets of {reps:8} Jefferson curls with light weight. Slow, controlled full spinal flexion.',stat:'Agility',baseRP:20,baseStatGain:1,goals:['discipline']},
+    {name:'Pancake Stretch Session',template:'Seated wide-leg forward fold: hold {time:60s}, walk hands side to side. {sets} rounds.',stat:'Agility',baseRP:16,baseStatGain:1,goals:['discipline']},
+    {name:'Ankle & Wrist Mobility',template:'Ankle circles {reps:20} each direction + wall ankle dorsiflexion drill {reps:10} each + wrist circles & prayer stretch {time:2m}.',stat:'Durability',baseRP:14,baseStatGain:1,goals:['discipline']},
+    {name:'Active Recovery Stretch',template:'Light walk {time:10m} then full-body static stretch {time:15m}. No rushing — breathe into each hold.',stat:'Durability',baseRP:16,baseStatGain:1,goals:['discipline']},
   ],
 };
 
@@ -1271,7 +1286,7 @@ function pickLifestyleQuests(goals, fitnessLevel, rankName, count, usedNames) {
     appearance:     (hasGoals ? (g.includes('appearance') ? 3 : 1) : 1),
     study:          (hasGoals ? (g.includes('study_more') ? 3 : 1) : 2),
     finance:        2, // always included
-    fitness_cardio: (hasGoals ? ((g.includes('lose_weight') || g.includes('build_muscle')) ? 2 : 1) : 1),
+    fitness_cardio: 2, // always included — cardio, flexibility and speed are universal needs
   };
 
   Object.entries(categoryWeights).forEach(([cat, weight]) => {

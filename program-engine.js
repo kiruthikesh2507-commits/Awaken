@@ -82,12 +82,15 @@ const EX_DB = {
     gym: [
       { name:'Barbell Shrugs', role:'isolation', pattern:'isolation_small', spinalLoad:false, loadable:true, stat:'Strength', baseSets:3, repRange:[12,15], baseRP:20, baseStatGain:1 },
       { name:'Dumbbell Farmer Shrugs', role:'isolation', pattern:'isolation_small', spinalLoad:false, loadable:true, stat:'Strength', baseSets:3, repRange:[12,15], baseRP:18, baseStatGain:1 },
+      { name:'Cable Upright Row (trap focus)', role:'accessory', pattern:'isolation_small', spinalLoad:false, loadable:true, stat:'Strength', baseSets:3, repRange:[12,15], baseRP:22, baseStatGain:1 },
     ],
     calisthenics: [
       { name:'Bar Hang Scap Shrugs', role:'isolation', pattern:'isolation_small', spinalLoad:false, loadable:false, stat:'Durability', baseSets:3, repRange:[10,15], baseRP:16, baseStatGain:1 },
+      { name:'Pike Push-Up Shrug', role:'accessory', pattern:'isolation_small', spinalLoad:false, loadable:false, stat:'Strength', baseSets:3, repRange:[12,15], baseRP:14, baseStatGain:1 },
     ],
     home: [
       { name:'Backpack Shrugs', role:'isolation', pattern:'isolation_small', spinalLoad:false, loadable:false, stat:'Strength', baseSets:3, repRange:[15,20], baseRP:12, baseStatGain:1 },
+      { name:'Resistance Band Shrugs', role:'accessory', pattern:'isolation_small', spinalLoad:false, loadable:false, stat:'Strength', baseSets:3, repRange:[15,20], baseRP:12, baseStatGain:1 },
     ],
   },
 
@@ -112,12 +115,15 @@ const EX_DB = {
   rotator_cuff: {
     gym: [
       { name:'Cable External Rotation', role:'isolation', pattern:'isolation_small', spinalLoad:false, loadable:true, stat:'Durability', baseSets:2, repRange:[12,15], baseRP:14, baseStatGain:1 },
+      { name:'Dumbbell Internal/External Rotation', role:'accessory', pattern:'isolation_small', spinalLoad:false, loadable:true, stat:'Durability', baseSets:2, repRange:[12,15], baseRP:14, baseStatGain:1 },
     ],
     calisthenics: [
       { name:'Band External Rotation', role:'isolation', pattern:'isolation_small', spinalLoad:false, loadable:false, stat:'Durability', baseSets:2, repRange:[12,15], baseRP:12, baseStatGain:1 },
+      { name:'Band Internal Rotation', role:'accessory', pattern:'isolation_small', spinalLoad:false, loadable:false, stat:'Durability', baseSets:2, repRange:[12,15], baseRP:12, baseStatGain:1 },
     ],
     home: [
       { name:'Band External Rotation', role:'isolation', pattern:'isolation_small', spinalLoad:false, loadable:false, stat:'Durability', baseSets:2, repRange:[12,15], baseRP:12, baseStatGain:1 },
+      { name:'Doorframe Internal Rotation', role:'accessory', pattern:'isolation_small', spinalLoad:false, loadable:false, stat:'Durability', baseSets:2, repRange:[12,15], baseRP:10, baseStatGain:1 },
     ],
   },
 
@@ -150,6 +156,7 @@ const EX_DB = {
     ],
     home: [
       { name:'Push-Up Plus', role:'accessory', pattern:'isolation_small', spinalLoad:false, loadable:false, stat:'Strength', baseSets:3, repRange:[12,15], baseRP:14, baseStatGain:1 },
+      { name:'Scapular Push-Ups', role:'isolation', pattern:'isolation_small', spinalLoad:false, loadable:false, stat:'Durability', baseSets:3, repRange:[12,15], baseRP:12, baseStatGain:1 },
     ],
   },
 
@@ -247,12 +254,15 @@ const EX_DB = {
     gym: [
       { name:'Standing Calf Raise', role:'isolation', pattern:'isolation_small', spinalLoad:false, loadable:true, stat:'Stamina', baseSets:4, repRange:[12,15], baseRP:18, baseStatGain:1 },
       { name:'Seated Calf Raise', role:'isolation', pattern:'isolation_small', spinalLoad:false, loadable:true, stat:'Stamina', baseSets:3, repRange:[15,20], baseRP:16, baseStatGain:1 },
+      { name:'Donkey Calf Raise', role:'accessory', pattern:'isolation_small', spinalLoad:false, loadable:true, stat:'Stamina', baseSets:3, repRange:[15,20], baseRP:18, baseStatGain:1 },
     ],
     calisthenics: [
       { name:'Single-Leg Calf Raise', role:'isolation', pattern:'isolation_small', spinalLoad:false, loadable:false, stat:'Stamina', baseSets:3, repRange:[15,20], baseRP:14, baseStatGain:1 },
+      { name:'Jump Rope — Calf Focus', role:'accessory', pattern:'isolation_small', spinalLoad:false, loadable:false, stat:'Speed', baseSets:3, repRange:[1,1], baseRP:18, baseStatGain:1 },
     ],
     home: [
       { name:'Calf Raise (stairs)', role:'isolation', pattern:'isolation_small', spinalLoad:false, loadable:false, stat:'Stamina', baseSets:3, repRange:[15,25], baseRP:10, baseStatGain:1 },
+      { name:'Single-Leg Calf Raise (stairs)', role:'accessory', pattern:'isolation_small', spinalLoad:false, loadable:false, stat:'Stamina', baseSets:3, repRange:[12,20], baseRP:12, baseStatGain:1 },
     ],
   },
 
@@ -294,12 +304,15 @@ const EX_DB = {
     gym: [
       { name:'Farmer Carry', role:'compound', pattern:'carry', spinalLoad:false, loadable:true, stat:'Durability', baseSets:3, repRange:[1,1], baseRP:22, baseStatGain:1 },
       { name:'Barbell Wrist Curl', role:'isolation', pattern:'isolation_small', spinalLoad:false, loadable:true, stat:'Durability', baseSets:3, repRange:[15,20], baseRP:14, baseStatGain:1 },
+      { name:'Reverse Curl', role:'accessory', pattern:'isolation_small', spinalLoad:false, loadable:true, stat:'Durability', baseSets:3, repRange:[12,15], baseRP:16, baseStatGain:1 },
     ],
     calisthenics: [
       { name:'Dead Hang', role:'compound', pattern:'carry', spinalLoad:false, loadable:false, stat:'Durability', baseSets:3, repRange:[1,1], baseRP:18, baseStatGain:1 },
+      { name:'Towel Pull-Up Grip', role:'accessory', pattern:'carry', spinalLoad:false, loadable:false, stat:'Durability', baseSets:3, repRange:[1,1], baseRP:16, baseStatGain:1 },
     ],
     home: [
       { name:'Towel Wring / Water-Bottle Wrist Curl', role:'isolation', pattern:'isolation_small', spinalLoad:false, loadable:false, stat:'Durability', baseSets:3, repRange:[15,20], baseRP:10, baseStatGain:1 },
+      { name:'Rice Bucket / Stress Ball Grip Work', role:'accessory', pattern:'isolation_small', spinalLoad:false, loadable:false, stat:'Durability', baseSets:3, repRange:[1,1], baseRP:10, baseStatGain:1 },
     ],
   },
 
@@ -307,12 +320,34 @@ const EX_DB = {
   neck: {
     gym: [
       { name:'Neck Harness Flexion/Extension', role:'isolation', pattern:'isolation_small', spinalLoad:false, loadable:true, stat:'Durability', baseSets:2, repRange:[12,15], baseRP:14, baseStatGain:1 },
+      { name:'Plate-Loaded Neck Flexion', role:'accessory', pattern:'isolation_small', spinalLoad:false, loadable:true, stat:'Durability', baseSets:2, repRange:[12,15], baseRP:14, baseStatGain:1 },
     ],
     calisthenics: [
       { name:'Manual Neck Resistance (4-way)', role:'isolation', pattern:'isolation_small', spinalLoad:false, loadable:false, stat:'Durability', baseSets:2, repRange:[10,12], baseRP:12, baseStatGain:1 },
+      { name:'Chin Tuck Isometric Hold', role:'accessory', pattern:'isolation_small', spinalLoad:false, loadable:false, stat:'Durability', baseSets:2, repRange:[1,1], baseRP:10, baseStatGain:1 },
     ],
     home: [
       { name:'Manual Neck Resistance (4-way)', role:'isolation', pattern:'isolation_small', spinalLoad:false, loadable:false, stat:'Durability', baseSets:2, repRange:[10,12], baseRP:10, baseStatGain:1 },
+      { name:'Chin Tuck Isometric Hold', role:'accessory', pattern:'isolation_small', spinalLoad:false, loadable:false, stat:'Durability', baseSets:2, repRange:[1,1], baseRP:10, baseStatGain:1 },
+    ],
+  },
+
+  // ═══ MOBILITY (new — dedicated flexibility/joint health exercises) ═══
+  mobility: {
+    gym: [
+      { name:'Hip 90/90 Stretch', role:'isolation', pattern:'core', spinalLoad:false, loadable:false, stat:'Agility', baseSets:2, repRange:[1,1], baseRP:14, baseStatGain:1 },
+      { name:'Thoracic Spine Foam Roll', role:'isolation', pattern:'core', spinalLoad:false, loadable:false, stat:'Durability', baseSets:2, repRange:[1,1], baseRP:12, baseStatGain:1 },
+      { name:'Ankle Mobility Drill', role:'isolation', pattern:'core', spinalLoad:false, loadable:false, stat:'Agility', baseSets:2, repRange:[12,15], baseRP:12, baseStatGain:1 },
+    ],
+    calisthenics: [
+      { name:'Hip 90/90 Stretch', role:'isolation', pattern:'core', spinalLoad:false, loadable:false, stat:'Agility', baseSets:2, repRange:[1,1], baseRP:14, baseStatGain:1 },
+      { name:'Jefferson Curl (light)', role:'compound', pattern:'hinge', spinalLoad:false, loadable:false, stat:'Agility', baseSets:3, repRange:[8,10], baseRP:18, baseStatGain:1 },
+      { name:'Cossack Squat', role:'accessory', pattern:'squat', spinalLoad:false, loadable:false, stat:'Agility', baseSets:3, repRange:[8,10], baseRP:18, baseStatGain:1 },
+    ],
+    home: [
+      { name:'Hip 90/90 Stretch', role:'isolation', pattern:'core', spinalLoad:false, loadable:false, stat:'Agility', baseSets:2, repRange:[1,1], baseRP:12, baseStatGain:1 },
+      { name:'Cossack Squat', role:'accessory', pattern:'squat', spinalLoad:false, loadable:false, stat:'Agility', baseSets:3, repRange:[8,10], baseRP:16, baseStatGain:1 },
+      { name:'Deep Squat Hold + Breathing', role:'isolation', pattern:'squat', spinalLoad:false, loadable:false, stat:'Agility', baseSets:2, repRange:[1,1], baseRP:10, baseStatGain:1 },
     ],
   },
 };
@@ -459,11 +494,27 @@ function recordExerciseResult(exerciseName, muscle, result) {
 // Compute the prescription (sets/reps/weight or sets/reps/hold) for an
 // exercise THIS session, based on its history. This is the heart of the
 // progressive-overload fix: it never just rerolls a random rep count.
-function getPrescription(exercise, fitnessLevel, bodyweightKg) {
+// Rank names in order — used to scale workout volume as user progresses
+const RANK_ORDER = ['Unranked','E-Rank','D-Rank','C-Rank','B-Rank','A-Rank','S-Rank','SS-Rank','SSS-Rank','X-Rank','Z-Rank'];
+
+function getRankTier(rankName) {
+  const idx = RANK_ORDER.indexOf(rankName);
+  return idx < 0 ? 0 : idx; // 0=Unranked, 1=E, 2=D ... 10=Z
+}
+
+// Scale sets by rank: compounds get +1 set every 2 rank tiers above E-Rank (capped at +3)
+function rankScaleSets(baseSets, role, rankTier) {
+  if (role !== 'compound') return baseSets; // only scale compound lifts
+  const bonus = Math.min(3, Math.floor(Math.max(0, rankTier - 1) / 2));
+  return baseSets + bonus;
+}
+
+function getPrescription(exercise, fitnessLevel, bodyweightKg, rankName) {
   const store = getExerciseProgressStore();
   const prog = store[exercise.name];
   const [repLow, repHigh] = exercise.repRange;
-  const sets = exercise.baseSets;
+  const rankTier = getRankTier(rankName || 'E-Rank');
+  const sets = rankScaleSets(exercise.baseSets, exercise.role, rankTier);
 
   // First time ever seeing this exercise — establish a baseline.
   if (!prog || !prog.history.length) {
@@ -542,13 +593,13 @@ const PROGRAM_SPLITS = {
         { muscle:'back', role:'compound' }, { muscle:'back', role:'compound', alt:true },
         { muscle:'back', role:'accessory' }, { muscle:'biceps', role:'compound' },
         { muscle:'rear_delts', role:'accessory' }, { muscle:'traps', role:'isolation' },
-        { muscle:'biceps', role:'isolation' }, { muscle:'forearms', role:'compound' },
+        { muscle:'rotator_cuff', role:'isolation' }, { muscle:'forearms', role:'compound' },
       ]},
       { label: 'Leg Day', slots: [
         { muscle:'quads', role:'compound' }, { muscle:'hamstrings', role:'compound' },
         { muscle:'glutes', role:'compound' }, { muscle:'quads', role:'accessory' },
-        { muscle:'quads', role:'isolation' }, { muscle:'calves', role:'isolation' },
-        { muscle:'core', role:'compound' },
+        { muscle:'calves', role:'isolation' }, { muscle:'core', role:'compound' },
+        { muscle:'obliques', role:'isolation' },
       ]},
     ],
   },
@@ -556,9 +607,11 @@ const PROGRAM_SPLITS = {
     days: 5,
     schedule: [
       { label: 'Chest Day', slots: [
-        { muscle:'chest', role:'compound' }, { muscle:'chest', role:'compound', alt:true },
-        { muscle:'chest', role:'accessory' }, { muscle:'chest', role:'isolation' },
+        { muscle:'chest', role:'compound' },
+        { muscle:'chest', role:'accessory' },
+        { muscle:'chest', role:'isolation' },
         { muscle:'serratus', role:'accessory' },
+        { muscle:'triceps', role:'isolation' },
       ]},
       { label: 'Back Day', slots: [
         { muscle:'back', role:'compound' }, { muscle:'back', role:'compound', alt:true },
@@ -579,7 +632,8 @@ const PROGRAM_SPLITS = {
       { label: 'Leg Day', slots: [
         { muscle:'quads', role:'compound' }, { muscle:'hamstrings', role:'compound' },
         { muscle:'glutes', role:'compound' }, { muscle:'quads', role:'accessory' },
-        { muscle:'hamstrings', role:'accessory' }, { muscle:'calves', role:'isolation' },
+        { muscle:'calves', role:'isolation' }, { muscle:'core', role:'compound' },
+        { muscle:'obliques', role:'isolation' },
       ]},
     ],
   },
@@ -615,7 +669,7 @@ const PROGRAM_SPLITS = {
       { label: 'Full Body A', slots: [
         { muscle:'quads', role:'compound' }, { muscle:'chest', role:'compound' },
         { muscle:'back', role:'compound' }, { muscle:'shoulders', role:'accessory' },
-        { muscle:'core', role:'compound' },
+        { muscle:'core', role:'compound' }, { muscle:'calves', role:'isolation' },
       ]},
       { label: 'Full Body B', slots: [
         { muscle:'hamstrings', role:'compound' }, { muscle:'shoulders', role:'compound' },
@@ -625,7 +679,8 @@ const PROGRAM_SPLITS = {
       { label: 'Full Body C', slots: [
         { muscle:'glutes', role:'compound' }, { muscle:'chest', role:'accessory' },
         { muscle:'back', role:'accessory' }, { muscle:'biceps', role:'compound' },
-        { muscle:'obliques', role:'isolation' },
+        { muscle:'obliques', role:'isolation' }, { muscle:'traps', role:'isolation' },
+        { muscle:'calves', role:'isolation' },
       ]},
     ],
   },
@@ -635,7 +690,7 @@ const MUSCLE_DISPLAY_NAMES = {
   chest:'Chest', back:'Back', shoulders:'Shoulders', biceps:'Biceps', triceps:'Triceps',
   quads:'Quads', hamstrings:'Hamstrings', glutes:'Glutes', calves:'Calves', core:'Core',
   forearms:'Forearms', traps:'Traps', rear_delts:'Rear Delts', rotator_cuff:'Rotator Cuff',
-  serratus:'Serratus Anterior', obliques:'Obliques', neck:'Neck',
+  serratus:'Serratus Anterior', obliques:'Obliques', neck:'Neck', mobility:'Mobility',
 };
 
 /* ───────────────────────────────────────────────────────────────────────
@@ -779,8 +834,10 @@ function buildStructuredWorkout(hunter) {
   pickedExercises = orderExercisesSafely(pickedExercises);
 
   // Attach prescriptions (progressive overload happens here)
+  // Pass rankName so higher ranks automatically get more volume on compound lifts
+  const rankName = (typeof getCurrentRank === 'function') ? getCurrentRank().name : (hunter.rankName || 'E-Rank');
   const exercisesWithPrescription = pickedExercises.map((ex, i) => {
-    const prescription = getPrescription(ex, fitnessLevel, bodyweightKg);
+    const prescription = getPrescription(ex, fitnessLevel, bodyweightKg, rankName);
     return {
       ...ex,
       id: `pe_${i}_${Date.now()}`,
