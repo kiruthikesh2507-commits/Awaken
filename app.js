@@ -1302,6 +1302,7 @@ function questCard(q) {
       </div>
       <div class="quest-name">${q.name}</div>
       <div class="quest-desc">${q.description}</div>
+      ${q.cue ? `<div class="quest-cue">⚑ ${q.cue}</div>` : ''}
       ${prescriptionHTML}
       <div class="quest-stat-tag">
         <div class="stat-dot" style="background:${statColor}"></div>

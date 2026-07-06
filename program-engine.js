@@ -34,8 +34,8 @@ const EX_DB = {
   // ═══ CHEST ═══
   chest: {
     gym: [
-      { name:'Barbell Bench Press', role:'compound', pattern:'horizontal_push', spinalLoad:false, loadable:true, stat:'Strength', baseSets:4, repRange:[5,8], baseRP:35, baseStatGain:3 },
-      { name:'Incline Dumbbell Press', role:'compound', pattern:'horizontal_push', spinalLoad:false, loadable:true, stat:'Strength', baseSets:3, repRange:[8,10], baseRP:30, baseStatGain:2 },
+      { name:'Barbell Bench Press', role:'compound', pattern:'horizontal_push', spinalLoad:false, loadable:true, stat:'Strength', baseSets:4, repRange:[5,8], baseRP:35, baseStatGain:3, cue:'At lockout fully protract your scapula — this hits serratus anterior. Keep your neck neutral throughout; never crane toward the bar.' },
+      { name:'Incline Dumbbell Press', role:'compound', pattern:'horizontal_push', spinalLoad:false, loadable:true, stat:'Strength', baseSets:3, repRange:[8,10], baseRP:30, baseStatGain:2, cue:'At the top punch the dumbbells up slightly to fully protract the scapula — activates serratus anterior. Upper chest and shoulder stabilisers work together here.' },
       { name:'Weighted Chest Dip', role:'accessory', pattern:'horizontal_push', spinalLoad:false, loadable:true, stat:'Strength', baseSets:3, repRange:[8,12], baseRP:28, baseStatGain:2 },
       { name:'Cable Crossover', role:'isolation', pattern:'isolation_small', spinalLoad:false, loadable:true, stat:'Strength', baseSets:3, repRange:[12,15], baseRP:22, baseStatGain:1 },
       { name:'Pec Deck Machine', role:'isolation', pattern:'isolation_small', spinalLoad:false, loadable:true, stat:'Strength', baseSets:3, repRange:[12,15], baseRP:20, baseStatGain:1 },
@@ -57,8 +57,8 @@ const EX_DB = {
   // ═══ BACK (lats/mid-back thickness) ═══
   back: {
     gym: [
-      { name:'Barbell Deadlift', role:'compound', pattern:'hinge', spinalLoad:true, loadable:true, stat:'Strength', baseSets:3, repRange:[4,6], baseRP:50, baseStatGain:4 },
-      { name:'Barbell Bent-Over Row', role:'compound', pattern:'horizontal_pull', spinalLoad:true, loadable:true, stat:'Strength', baseSets:4, repRange:[6,10], baseRP:35, baseStatGain:3 },
+      { name:'Barbell Deadlift', role:'compound', pattern:'hinge', spinalLoad:true, loadable:true, stat:'Strength', baseSets:3, repRange:[4,6], baseRP:50, baseStatGain:4, cue:'Brace your entire core 360° before the pull — obliques fire to protect the spine. Keep your neck neutral (eyes forward). Upper traps, neck stabilisers, and entire posterior chain work isometrically to hold position through the pull.' },
+      { name:'Barbell Bent-Over Row', role:'compound', pattern:'horizontal_pull', spinalLoad:true, loadable:true, stat:'Strength', baseSets:4, repRange:[6,10], baseRP:35, baseStatGain:3, cue:'At the top squeeze shoulder blades and hold 1 second — this fully engages rear delts and rotator cuff. Keep the neck packed and neutral throughout; never jerk the head up.' },
       { name:'Lat Pulldown', role:'compound', pattern:'vertical_pull', spinalLoad:false, loadable:true, stat:'Strength', baseSets:3, repRange:[8,12], baseRP:28, baseStatGain:2 },
       { name:'Seated Cable Row', role:'accessory', pattern:'horizontal_pull', spinalLoad:false, loadable:true, stat:'Strength', baseSets:3, repRange:[10,12], baseRP:26, baseStatGain:2 },
       { name:'Chest-Supported Dumbbell Row', role:'accessory', pattern:'horizontal_pull', spinalLoad:false, loadable:true, stat:'Strength', baseSets:3, repRange:[10,12], baseRP:26, baseStatGain:2 },
@@ -80,7 +80,7 @@ const EX_DB = {
   // ═══ TRAPS (explicit, was missing) ═══
   traps: {
     gym: [
-      { name:'Barbell Shrugs', role:'isolation', pattern:'isolation_small', spinalLoad:false, loadable:true, stat:'Strength', baseSets:3, repRange:[12,15], baseRP:20, baseStatGain:1 },
+      { name:'Barbell Shrugs', role:'isolation', pattern:'isolation_small', spinalLoad:false, loadable:true, stat:'Strength', baseSets:3, repRange:[12,15], baseRP:20, baseStatGain:1, cue:'Shrug straight up — no rolling. Hold the top for 2 seconds. Upper traps and the muscles that brace the neck (levator scapulae, splenius capitis) all contract isometrically. Keep your head still and upright.' },
       { name:'Dumbbell Farmer Shrugs', role:'isolation', pattern:'isolation_small', spinalLoad:false, loadable:true, stat:'Strength', baseSets:3, repRange:[12,15], baseRP:18, baseStatGain:1 },
       { name:'Cable Upright Row (trap focus)', role:'accessory', pattern:'isolation_small', spinalLoad:false, loadable:true, stat:'Strength', baseSets:3, repRange:[12,15], baseRP:22, baseStatGain:1 },
     ],
@@ -97,7 +97,7 @@ const EX_DB = {
   // ═══ REAR DELTS (explicit, was missing) ═══
   rear_delts: {
     gym: [
-      { name:'Face Pull', role:'accessory', pattern:'isolation_small', spinalLoad:false, loadable:true, stat:'Durability', baseSets:3, repRange:[15,20], baseRP:20, baseStatGain:1 },
+      { name:'Face Pull', role:'accessory', pattern:'isolation_small', spinalLoad:false, loadable:true, stat:'Durability', baseSets:3, repRange:[15,20], baseRP:20, baseStatGain:1, cue:'Pull to face height, externally rotate at the end position and hold 2 seconds. Best exercise for rotator cuff health and rear delt development — counteracts all the internal rotation from pressing. Never skip this.' },
       { name:'Rear Delt Fly (cable or dumbbell)', role:'isolation', pattern:'isolation_small', spinalLoad:false, loadable:true, stat:'Durability', baseSets:3, repRange:[15,20], baseRP:18, baseStatGain:1 },
       { name:'Bent-Over Reverse Fly', role:'isolation', pattern:'isolation_small', spinalLoad:false, loadable:true, stat:'Durability', baseSets:3, repRange:[15,20], baseRP:18, baseStatGain:1 },
     ],
@@ -130,7 +130,7 @@ const EX_DB = {
   // ═══ SHOULDERS (front/side delts) ═══
   shoulders: {
     gym: [
-      { name:'Barbell Overhead Press', role:'compound', pattern:'vertical_push', spinalLoad:false, loadable:true, stat:'Strength', baseSets:4, repRange:[6,8], baseRP:32, baseStatGain:3 },
+      { name:'Barbell Overhead Press', role:'compound', pattern:'vertical_push', spinalLoad:false, loadable:true, stat:'Strength', baseSets:4, repRange:[6,8], baseRP:32, baseStatGain:3, cue:'Keep your neck packed (chin slightly tucked) — upper traps and deep neck flexors brace isometrically under load. At lockout shrug the bar toward the ceiling to fully activate lower traps and serratus anterior.' },
       { name:'Dumbbell Lateral Raise', role:'isolation', pattern:'isolation_small', spinalLoad:false, loadable:true, stat:'Strength', baseSets:3, repRange:[12,15], baseRP:20, baseStatGain:1 },
       { name:'Cable Lateral Raise', role:'isolation', pattern:'isolation_small', spinalLoad:false, loadable:true, stat:'Strength', baseSets:3, repRange:[12,15], baseRP:20, baseStatGain:1 },
     ],
@@ -197,7 +197,7 @@ const EX_DB = {
   // ═══ QUADS ═══
   quads: {
     gym: [
-      { name:'Barbell Back Squat', role:'compound', pattern:'squat', spinalLoad:true, loadable:true, stat:'Strength', baseSets:4, repRange:[5,8], baseRP:42, baseStatGain:4 },
+      { name:'Barbell Back Squat', role:'compound', pattern:'squat', spinalLoad:true, loadable:true, stat:'Strength', baseSets:4, repRange:[5,8], baseRP:42, baseStatGain:4, cue:'Big breath and brace your obliques hard before descending — they protect the spine under load. Drive knees out over toes to engage hip flexors and tibialis anterior. Keep your neck neutral; eyes forward or slightly up.' },
       { name:'Leg Press', role:'compound', pattern:'squat', spinalLoad:false, loadable:true, stat:'Strength', baseSets:3, repRange:[10,12], baseRP:28, baseStatGain:2 },
       { name:'Bulgarian Split Squat', role:'accessory', pattern:'squat', spinalLoad:false, loadable:true, stat:'Strength', baseSets:3, repRange:[8,10], baseRP:30, baseStatGain:2 },
       { name:'Leg Extension', role:'isolation', pattern:'isolation_small', spinalLoad:false, loadable:true, stat:'Strength', baseSets:3, repRange:[12,15], baseRP:20, baseStatGain:1 },
@@ -236,7 +236,7 @@ const EX_DB = {
   // ═══ GLUTES ═══
   glutes: {
     gym: [
-      { name:'Barbell Hip Thrust', role:'compound', pattern:'hinge', spinalLoad:false, loadable:true, stat:'Strength', baseSets:4, repRange:[8,10], baseRP:32, baseStatGain:3 },
+      { name:'Barbell Hip Thrust', role:'compound', pattern:'hinge', spinalLoad:false, loadable:true, stat:'Strength', baseSets:4, repRange:[8,10], baseRP:32, baseStatGain:3, cue:'Drive through the heels, squeeze glutes hard at the top and hold 2 seconds. Chin tucked — do not hyperextend the neck. Actively lengthens hip flexors under load, improving hip flexibility over time.' },
       { name:'Cable Kickback', role:'isolation', pattern:'isolation_small', spinalLoad:false, loadable:true, stat:'Strength', baseSets:3, repRange:[12,15], baseRP:18, baseStatGain:1 },
     ],
     calisthenics: [
@@ -269,7 +269,7 @@ const EX_DB = {
   // ═══ CORE (rectus abdominis) ═══
   core: {
     gym: [
-      { name:'Hanging Leg Raise', role:'compound', pattern:'core', spinalLoad:false, loadable:false, stat:'Discipline', baseSets:3, repRange:[8,12], baseRP:26, baseStatGain:2 },
+      { name:'Hanging Leg Raise', role:'compound', pattern:'core', spinalLoad:false, loadable:false, stat:'Discipline', baseSets:3, repRange:[8,12], baseRP:26, baseStatGain:2, cue:'Initiate from the pelvis — tilt it posteriorly before raising legs. This fires hip flexors and lower abs together. Serratus anterior engages to stabilise the grip overhead. Obliques control any lateral sway.' },
       { name:'Cable Crunch', role:'accessory', pattern:'core', spinalLoad:false, loadable:true, stat:'Discipline', baseSets:3, repRange:[12,15], baseRP:20, baseStatGain:1 },
       { name:'Ab Wheel Rollout', role:'isolation', pattern:'core', spinalLoad:false, loadable:false, stat:'Discipline', baseSets:3, repRange:[8,12], baseRP:24, baseStatGain:2 },
     ],
@@ -302,7 +302,7 @@ const EX_DB = {
   // ═══ FOREARMS / GRIP ═══
   forearms: {
     gym: [
-      { name:'Farmer Carry', role:'compound', pattern:'carry', spinalLoad:false, loadable:true, stat:'Durability', baseSets:3, repRange:[1,1], baseRP:22, baseStatGain:1 },
+      { name:'Farmer Carry', role:'compound', pattern:'carry', spinalLoad:false, loadable:true, stat:'Durability', baseSets:3, repRange:[1,1], baseRP:22, baseStatGain:1, cue:'Walk tall — chest up, shoulders back, neck packed neutral. Trains grip, forearms, upper traps, deep neck stabilisers, and obliques simultaneously. One of the best total-body strength and conditioning movements that exists.' },
       { name:'Barbell Wrist Curl', role:'isolation', pattern:'isolation_small', spinalLoad:false, loadable:true, stat:'Durability', baseSets:3, repRange:[15,20], baseRP:14, baseStatGain:1 },
       { name:'Reverse Curl', role:'accessory', pattern:'isolation_small', spinalLoad:false, loadable:true, stat:'Durability', baseSets:3, repRange:[12,15], baseRP:16, baseStatGain:1 },
     ],
@@ -359,8 +359,8 @@ const EX_DB = {
 const WARMUP_TEMPLATES = {
   squat:           { name:'Warmup — Lower Body Activation', desc:'5 min light cardio, then 2 sets of 10 bodyweight squats + 10 leg swings each leg + 1 light ramp-up set of today\'s first lift at ~50% working weight.' },
   hinge:           { name:'Warmup — Hip Hinge Prep', desc:'5 min light cardio, then 2 sets of 10 glute bridges + 10 bodyweight RDLs + 1 light ramp-up set of today\'s first lift at ~50% working weight.' },
-  horizontal_push: { name:'Warmup — Push Prep', desc:'5 min light cardio, then 2 sets of 10 band pull-aparts + 10 arm circles + 1 light ramp-up set of today\'s first press at ~50% working weight.' },
-  vertical_push:   { name:'Warmup — Shoulder Prep', desc:'5 min light cardio, then band external rotations x10 each side + 10 arm circles + 1 light ramp-up set of today\'s press at ~50% working weight.' },
+  horizontal_push: { name:'Warmup — Push Prep', desc:'5 min light cardio, then 2×10 band pull-aparts (rotator cuff activation), 10 arm circles each direction, and 1 ramp-up set at ~50% working weight. The band pull-aparts bulletproof the rotator cuff and rear delts before any pressing.' },
+  vertical_push:   { name:'Warmup — Shoulder Prep', desc:'5 min light cardio, then band external rotations ×10 each side (rotator cuff activation), 10 arm circles, pike hold 20s (serratus anterior), and 1 ramp-up set at ~50% working weight.' },
   horizontal_pull: { name:'Warmup — Pull Prep', desc:'5 min light cardio, then 2 sets of 10 scapular pulls/band rows + 1 light ramp-up set of today\'s first pull at ~50% working weight.' },
   vertical_pull:   { name:'Warmup — Pull Prep', desc:'5 min light cardio, then 2 sets of 10 scapular pulls + dead hangs 20s + 1 light ramp-up set at ~50% working effort.' },
   core:            { name:'Warmup — Core Activation', desc:'2 min light cardio, then cat-cow x10 + dead bug x10 each side to activate the core before loading it.' },
@@ -368,11 +368,11 @@ const WARMUP_TEMPLATES = {
 };
 
 const COOLDOWN_TEMPLATES = {
-  squat:           { name:'Cooldown — Lower Body Stretch', desc:'Hold a quad stretch and a couch stretch 30s each side, plus a 30s deep squat hold to close out leg day.' },
-  hinge:           { name:'Cooldown — Posterior Chain Stretch', desc:'Hold a standing hamstring stretch and a child\'s pose 30-45s each to release the hips and lower back.' },
-  horizontal_push: { name:'Cooldown — Chest/Shoulder Stretch', desc:'Doorway chest stretch 30s each side + cross-body shoulder stretch 30s each arm.' },
+  squat:           { name:'Cooldown — Lower Body Stretch', desc:'Couch stretch 45s each side (quad + hip flexor), deep squat hold 30s (ankle + hip flexibility), lying hip flexor stretch 30s each side. Finish with 10 slow neck circles — squats brace the neck isometrically so it earns a stretch.' },
+  hinge:           { name:'Cooldown — Posterior Chain Stretch', desc:'Standing hamstring stretch 45s each leg, child\'s pose 45s, figure-4 piriformis stretch 30s each side. Finish with chin-tuck neck stretch 20s each side — deadlifts brace the neck hard and it needs to be released.' },
+  horizontal_push: { name:'Cooldown — Chest/Shoulder Stretch', desc:'Doorway chest stretch 45s each side (also lengthens serratus anterior), cross-body shoulder stretch 30s each arm, overhead tricep stretch 20s each. Finish with 10 slow neck rolls to release isometric neck tension from pressing.' },
   vertical_push:   { name:'Cooldown — Shoulder Stretch', desc:'Doorway shoulder stretch 30s each side + overhead tricep stretch 30s each arm.' },
-  horizontal_pull: { name:'Cooldown — Back/Lat Stretch', desc:'Child\'s pose 45s + lat stretch on a bar or doorframe 30s each side.' },
+  horizontal_pull: { name:'Cooldown — Back/Lat Stretch', desc:'Child\'s pose 45s (lats + lower traps), lat stretch on bar or doorframe 30s each side, rear-delt cross-body stretch 20s each arm. Finish with 10 slow chin tucks to decompress the neck — rows load it isometrically.' },
   vertical_pull:   { name:'Cooldown — Lat Stretch', desc:'Active hang or lat stretch on a doorframe 30-45s, plus child\'s pose 45s.' },
   core:            { name:'Cooldown — Core/Spine Reset', desc:'Child\'s pose 45s followed by a gentle cat-cow flow for 60s to decompress the spine.' },
   default:         { name:'Cooldown — General Stretch', desc:'5 minutes of static stretching for the muscles trained today, holding each stretch 30s.' },
@@ -689,8 +689,9 @@ const PROGRAM_SPLITS = {
 const MUSCLE_DISPLAY_NAMES = {
   chest:'Chest', back:'Back', shoulders:'Shoulders', biceps:'Biceps', triceps:'Triceps',
   quads:'Quads', hamstrings:'Hamstrings', glutes:'Glutes', calves:'Calves', core:'Core',
-  forearms:'Forearms', traps:'Traps', rear_delts:'Rear Delts', rotator_cuff:'Rotator Cuff',
-  serratus:'Serratus Anterior', obliques:'Obliques', neck:'Neck', mobility:'Mobility',
+  forearms:'Forearms', traps:'Traps', rear_delts:'Rear Delts',
+  // neck, serratus, rotator_cuff trained via compound cues + warmup/cooldown
+  serratus:'Serratus', obliques:'Obliques',
 };
 
 /* ───────────────────────────────────────────────────────────────────────

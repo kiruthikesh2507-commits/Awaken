@@ -1473,6 +1473,8 @@ function _exerciseToQuestCard(item, idx, ts, kind) {
     loadable: item.loadable,
     prescription: p,
     role: item.role,
+    cue: item.cue || null,       // technique cue folding in hidden muscles
+    repRange: item.repRange,
   };
 }
 
